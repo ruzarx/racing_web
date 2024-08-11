@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block side_panel %}
+    <form method="get">
+        <label for="season">Season:</label>
+        <select id="season" name="season" onchange="this.form.submit()">
+            {% for season in range(2023, 2025) %}
+                <option value="{{ season }}" {% if season == selected_season|int %} selected {% endif %}>{{ season }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <ul>
+        {% for month, races in calendar_data.items() %}
+            <li>{{ month }}</li>
+            <ul>
+                {% for race in races %}
+                    <li>
+                        <a href="{{ url_for('nascar', season=selected_season, race=race.race_number) }}"
+                                class="{% if race.season_stage != 'season' %}playoff-race 
+                                {% if race.season_stage == 'playoff_16' %}playoff-16
+                                {% elif race.season_stage == 'playoff_12' %}playoff-12
+                                {% elif race.season_stage == 'playoff_8' %}playoff-8
+                                {% elif race.season_stage == 'playoff_4' %}playoff-4
+                                {% endif %}
+                            {% endif %}">
+                            {{ race.race_date.day|ordinal_suffix }} - {{ race.track_short_name }} ({{ race.track_type_short }})
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <h2>NASCAR Results - Season {{ selected_season }}</h2>
+
+    {# Show results only if a race is selected #}
+    {% if selected_race %}
+        <h3>{{ selected_race_data.track_name }} - {{ selected_race_data.race_date.strftime('%B') }} {{ selected_race_data.race_date.day|ordinal_suffix}}</h3>
+        <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - {{ selected_race|ordinal_suffix }} race of the season</h5> </h5>
+        
+        <ul class="main-tabs"> 
+            <li class="main-tab-link" data-tab="race-results">Race Results</li>
+            <li class="main-tab-link" data-tab="race-details">Race Details</li>
+            <li class="main-tab-link" data-tab="season-standings">Season Standings</li>
+            <li class="main-tab-link" data-tab="playoff-standings">Playoff Standings</li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="race-results" class="tab">
+            <ul class="session-tabs">
+                {% for session in selected_race_data.results.keys() %}
+                    <li class="session-tab-link" data-tab="{{ session }}">{{ session }}</li>
+                {% endfor %}
+            </ul>
+
+            <div class="session-tab-content">
+                {% for session, results in selected_race_data.results.items() %}
+                    <div id="{{ session }}" class="session-tab">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Position</th>
+                                    <th>Driver</th>
+                                    <th>Car Number</th>
+                                    <th>Team</th>
+                                    <th>Make</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for driver, rest_data in results.items() %}
+                                    <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %} class="top-ten"{% endif %}>
+                                        <td>{{ rest_data.position }}</td>
+                                        <td>{{ driver }}</td>
+                                        <td>{{ rest_data.car_number }}</td>
+                                        <td>{{ rest_data.team }}</td>
+                                        <td>{{ rest_data.make }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="race-details" class="tab">
+            <p>Race details content will go here.</p> 
+        </div>
+
+        <div id="season-standings" class="tab">
+            <p>Season standings content will go here.</p>
+        </div>
+
+        <div id="playoff-standings" class="tab">
+            <p>Playoff standings content will go here.</p>
+        </div>
+    </div>
+    {% else %}
+        <p>The race results are not ready yet</p>
+    {% endif %}
+
+{% endblock %}

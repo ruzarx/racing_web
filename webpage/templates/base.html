@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %} - Racing Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Racing Analytics</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('nascar') }}">NASCAR</a></li>
+                <li><a href="{{ url_for('formula1') }}">Formula 1</a></li>
+                <li><a href="{{ url_for('wec') }}">WEC</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container"> {# Add a container for the layout #}
+        <aside class="side-panel">
+            {% block side_panel %}
+            {% endblock %}
+        </aside>
+        <main>
+            {% if welcome_message %}
+                <p>{{ welcome_message }}</p>
+            {% endif %}
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2024 Racing Analytics</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainTabs = document.querySelectorAll('.main-tab-link');
+            const mainTabContent = document.querySelectorAll('.tab');
+        
+            // Event delegation for session tabs
+            document.addEventListener('click', (event) => {
+                if (event.target.classList.contains('session-tab-link')) {
+                    const tabId = event.target.dataset.tab;
+        
+                    // Deactivate all session tabs
+                    document.querySelectorAll('.session-tab-link').forEach(t => t.classList.remove('active'));
+                    // Activate the clicked tab
+                    event.target.classList.add('active');
+        
+                    // Hide all session tab content
+                    document.querySelectorAll('.session-tab').forEach(tc => tc.classList.remove('active'));
+                    // Show the content for the clicked tab
+                    document.getElementById(tabId).classList.add('active');
+                }
+            });
+        
+            mainTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+        
+                    mainTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+        
+                    mainTabContent.forEach(tc => tc.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+        
+                    // If 'Race Results' tab is clicked, activate the first session tab
+                    if (tabId === 'race-results') {
+                        const firstSessionTab = document.querySelector('.session-tab-link');
+                        if (firstSessionTab) {
+                            firstSessionTab.click(); 
+                        }
+                    }
+                });
+            });
+        
+            // Activate the first main tab by default
+            mainTabs[0].click();
+        });
+        </script>
+        
+</body>
+</html>

@@ -1,0 +1,255 @@
+body {
+    font-family: sans-serif;
+    flex: 1;
+    margin: 0;
+    background-color: #ffffff; /* Light gray background for better contrast */
+    color: #333;                /* Darker text for readability */
+}
+
+header {
+    background-color: #ffffff;   /* White background for header */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    padding: 1rem;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav li {
+    display: inline;
+    margin-right: 1rem;
+}
+
+nav a {
+    color: #007bff;             /* Blue color for links */
+    text-decoration: none;
+}
+
+main {
+    padding: 1rem;
+    flex: 1;
+    background-color: #75a1ed;     /* White background for content */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    background-color: #ffffff;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.tabs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tab-link {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #f2f2f2;
+    width: calc(90% / 4);
+    box-sizing: border-box;
+    text-align: center;
+    cursor: pointer;
+}
+
+.tab-link.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.tab-content {
+    margin-top: 1rem;
+}
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+}
+
+.container {
+    display: flex; /* Use flexbox for layout */
+}
+
+.side-panel {
+    width: 220px; /* Adjust width as needed */
+    background-color: #f0f0f0;
+    padding: 1rem;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+}
+
+.side-panel ul {
+    list-style: none; /* Remove list dots for all lists in the side panel */
+    padding: 0;       /* Remove default padding */
+}
+
+.side-panel li {  /* Add styles to align month names to the left */
+    text-align: left;
+}
+
+.side-panel ul ul li {  /* Target second-level list items (races) */
+    padding-left: 1rem; /* Adjust the value for desired indentation */
+}
+
+.side-panel ul ul li a {         /* Style the link itself */
+    text-decoration: none;      
+    color: #0e0e0e;                
+}
+
+.side-panel ul ul li a:hover {  /* Add a hover effect for visual feedback */
+    text-decoration: underline;  
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse; /* Remove gaps between borders */
+    margin-bottom: 2rem;      /* Add space between tables */
+    font-size: 14px;         /* Adjust font size as needed */
+}
+
+th, td {
+    border: 1px solid #ccc;  /* Light gray border */
+    padding: 0.8rem;        /* More padding for better readability */
+    text-align: center;     /* Center align text within cells */
+}
+
+/* Zebra striping for rows */
+tbody tr:nth-child(even) {
+    background-color: #f8f8f8; /* Alternate background color for even rows */
+}
+
+/* Table header styles */
+thead {
+    background-color: #007bff; /* Blue background for the header */
+    color: white;              /* White text color for contrast */
+}
+
+th {
+    /* Removed background color and font weight */
+    padding: 0.8rem;  /* Increased padding to match cells */
+    text-align: center;
+}
+
+/* Table body styles */
+td {
+    border: 1px solid #ccc;
+    padding: 0.8rem;
+    text-align: center;
+}
+
+/* Zebra striping for rows */
+tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+.winner {
+    background-color: #FFD700; /* Light blue background for the winner */
+    font-weight: bold;
+}
+
+/* Alternate background colors for top-ten rows */
+tbody tr.top-ten:nth-child(even) {
+    background-color: #fff9c4; /* Light yellow background */
+}
+
+tbody tr.top-ten:nth-child(odd) {
+    background-color: #fff59d; /* Slightly darker yellow */
+}
+
+/* Alternate background colors for the rest of the field */
+tbody tr:not(.winner):not(.top-ten):nth-child(even) {
+    background-color: #f5f5f5; /* Light gray background */
+}
+
+tbody tr:not(.winner):not(.top-ten):nth-child(odd) {
+    background-color: #eeeeee; /* Slightly darker gray */
+}
+
+
+/* .side-panel ul ul li a.playoff-race {
+    font-weight: bold;
+} */
+
+.side-panel ul ul li a.playoff-16 {
+    color: #45b31275; /* Red */
+}
+
+.side-panel ul ul li a.playoff-12 {
+    color: #b6a618; /* Orange */
+}
+
+.side-panel ul ul li a.playoff-8 {
+    color: #ea933c; /* Yellow */
+}
+
+.side-panel ul ul li a.playoff-4 {
+    color: #990707; /* Green */
+}
+
+
+
+.main-tabs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Make the main tabs display in a row */
+    justify-content: space-around; /* Distribute tabs evenly */
+}
+
+.main-tab-link {
+    display: block;
+    width: calc(100% / 4); /* Adjust divisor if you have more/less tabs */
+    box-sizing: border-box;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    background-color: #f2f2f2;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.main-tab-link.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.main-tab-link:hover {
+    background-color: #e0e0e0;
+}
+
+/* Styles for the session tabs within Race Results */
+.session-tabs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Make the session tabs display in a row */
+    justify-content: space-around;
+}
+
+.session-tab-link {
+    display: block;
+    width: calc(100% / 4); /* Adjust divisor based on number of session tabs */
+    box-sizing: border-box;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    background-color: #f2f2f2;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.session-tab-link.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.session-tab-link:hover {
+    background-color: #e0e0e0;
+}

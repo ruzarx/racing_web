@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>F1 Results - Season {{ selected_season }}</h2>
+    <select id="season-select">
+        {% for season in range(2020, 2025) %}
+            <option value="{{ season }}" {% if season == selected_season %} selected {% endif %}>{{ season }}</option>
+        {% endfor %}
+    </select>
+
+    {% for race in race_data %}
+        <h3>{{ race.name }}</h3>
+        <ul>
+            {% for session, results in race.results.items() %}
+                <li>{{ session }}:
+                    <ol>
+                        {% for driver, position in results.items() %}
+                            <li>{{ driver }} - {{ position }}</li>
+                        {% endfor %}
+                    </ol>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}
