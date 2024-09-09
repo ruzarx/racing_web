@@ -1,12 +1,13 @@
 import sys
 sys.path.append('.')
+sys.path.append('..')
 
 from flask import Flask, render_template, request
-from utils import data_processing
+import data_processing
 from datetime import date
 import inflect
 
-from db_connectors import DBReader
+from scrapper.db_connectors import DBReader
 
 
 app = Flask(__name__)
@@ -63,4 +64,4 @@ def wec():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5003)
+    app.run(debug=True, port=5000, host='0.0.0.0')

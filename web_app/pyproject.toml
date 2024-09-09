@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "web-app"
+version = "0.1.0"
+description = ""
+authors = ["ruzarx <ruzarx@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "3.0.3"
+inflect = "^7.4.0"
+flask-sqlalchemy = "^3.1.1"
+sqlalchemy = "^2.0.34"
+pandas = "^2.2.2"
+pathlib = "^1.0.1"
+psycopg2 = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

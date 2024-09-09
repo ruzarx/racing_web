@@ -1,6 +1,6 @@
-from db_scrapper import scrap_race
-from db_connectors import DBWriter
-from file_parsers import NascarRaceDataParser, NascarResultsParser
+from scrapper.db_scrapper import scrap_race
+from scrapper.db_connectors import DBWriter
+from scrapper.file_parsers import NascarRaceDataParser, NascarResultsParser
 
 from flask import Flask
 

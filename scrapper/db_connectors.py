@@ -5,9 +5,9 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text, select
 
-from webpage.utils.tracks_to_types import tracks_to_types, tracks_to_short
+from utils.tracks_to_types import tracks_to_types, tracks_to_short
 
-from nascar_dataclasses import NascarRaceDataObject, NascarRaceResultsObject, NascarStandingsObject, NascarCalendarObject
+from scrapper.nascar_dataclasses import NascarRaceDataObject, NascarRaceResultsObject, NascarStandingsObject, NascarCalendarObject
 
 
 class DBWriter:
@@ -43,7 +43,7 @@ class DBWriter:
         return
     
     def fill_calendar_info(self) -> None:
-        from nascar_calendars import calendar_2023, calendar_2024
+        from scrapper.nascar_calendars import calendar_2023, calendar_2024
 
         with self.app.app_context():
             class CalendarTable(self.db.Model):

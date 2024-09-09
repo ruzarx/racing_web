@@ -2,8 +2,8 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from nascar_dataclasses import NascarRaceDataObject, NascarStandingsObject, NascarRaceResultsObject
-from webpage.utils.owners_to_teams import owners_to_teams
+from scrapper.nascar_dataclasses import NascarRaceDataObject, NascarStandingsObject, NascarRaceResultsObject
+from utils.owners_to_teams import owners_to_teams
 
 
 class NascarRaceDataParser:

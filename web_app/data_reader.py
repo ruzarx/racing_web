@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from owners_to_teams import owners_to_teams
+from utils.owners_to_teams import owners_to_teams
 
 data_folder = '../data'
 race_info_file_name = 'race_info.csv'

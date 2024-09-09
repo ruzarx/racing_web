@@ -9,8 +9,6 @@ import pandas as pd
 
 from utils.owners_to_teams import owners_to_teams
 from utils.tracks_to_types import tracks_to_types, tracks_to_short
-from nascar_dataclasses import NascarCalendarObject
-
 
 
 def fix_team_names(team_names: list) -> list:
