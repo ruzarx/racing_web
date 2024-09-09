@@ -8,7 +8,7 @@ WORKDIR /code/scrapper
 
 COPY ./scrapper/poetry.lock ./scrapper/pyproject.toml /code/scrapper/
 
-RUN curl -sSL https://install.python-poetry.org | python3 - &&
+RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:$PATH"
 
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
