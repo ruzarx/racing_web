@@ -1,17 +1,19 @@
 FROM selenium/standalone-chrome
-
 USER root
-RUN apt-get update
 
 RUN mkdir -p /code
 WORKDIR /code/scrapper
 
-COPY ./scrapper/poetry.lock ./scrapper/pyproject.toml /code/scrapper/
+RUN apt-get update
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH="/root/.local/bin:$PATH"
+# COPY ./scrapper/poetry.lock ./scrapper/pyproject.toml /code/scrapper/
+COPY requirements.txt /code/
 
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+RUN pip install -r requirements.txt
+
+# RUN curl -sSL https://install.python-poetry.org | python3 -
+# ENV PATH="/root/.local/bin:$PATH"
+# RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
 
 COPY . /code
 ENTRYPOINT [ "poetry", "run", "python" ]
