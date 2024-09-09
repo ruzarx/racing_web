@@ -1,5 +1,9 @@
 FROM selenium/standalone-chrome
+
 USER root
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python get-pip.py
+RUN python -m pip install selenium
 
 RUN mkdir -p /code
 WORKDIR /code/scrapper
