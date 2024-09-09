@@ -4,7 +4,8 @@ USER root
 RUN mkdir -p /code
 WORKDIR /code/scrapper
 
-RUN apt-get update && apt install python3-pip
+RUN apt-get update
+RUN apt-get install python3-pip
 
 # COPY ./scrapper/poetry.lock ./scrapper/pyproject.toml /code/scrapper/
 COPY requirements.txt /code/
