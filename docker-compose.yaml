@@ -2,23 +2,23 @@ services:
     
   scrapper:
       build:
-        context: ./scrapper
-        dockerfile: Dockerfile
+        context: .
+        dockerfile: Dockerfile_scrapper
       volumes:
-        - scrapper/:/home/jovyan/scrapper/
+        - /:/home/jovyan/
 
   webapp:
       build:
         context: .
         dockerfile: Dockerfile_webapp
       volumes:
-        - web_app/:/home/jovyan/web_app/
+        - /:/home/jovyan/
 
   postgres:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_DB: my_db
+      POSTGRES_DB: racing_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:

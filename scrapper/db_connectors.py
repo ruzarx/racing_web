@@ -1,4 +1,6 @@
 from datetime import datetime
+import sys
+sys.path.append('..')
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
