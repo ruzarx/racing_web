@@ -1,20 +1,27 @@
-FROM selenium/standalone-chrome
+# FROM selenium/standalone-chrome
 
-USER root
-RUN wget https://bootstrap.pypa.io/get-pip.py
-RUN python3 get-pip.py
-RUN python3 -m pip install selenium
+# USER root
+# RUN wget https://bootstrap.pypa.io/get-pip.py
+# RUN python3 get-pip.py
+# RUN python3 -m pip install selenium
+
+
+FROM joyzoursky/python-chromedriver:3.9-selenium
+
+RUN mkdir packages
+ADD requirements.txt packages
+RUN pip install -r packages/requirements.txt
 
 RUN mkdir -p /code
 WORKDIR /code/scrapper
 
 RUN apt-get update
-RUN apt-get install python3-pip
+# RUN apt-get install python3-pip
 
 # COPY ./scrapper/poetry.lock ./scrapper/pyproject.toml /code/scrapper/
-COPY requirements.txt /code/
+# COPY requirements.txt /code/
 
-RUN pip install -r requirements.txt
+# RUN pip install -r requirements.txt
 
 # RUN curl -sSL https://install.python-poetry.org | python3 -
 # ENV PATH="/root/.local/bin:$PATH"
