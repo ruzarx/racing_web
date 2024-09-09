@@ -2,20 +2,17 @@ FROM selenium/standalone-chrome
 
 USER root
 RUN apt-get update
-# RUN wget https://bootstrap.pypa.io/get-pip.py
-# RUN python get-pip.py
-# RUN pip install selenium
 
 RUN mkdir -p /code
 WORKDIR /code/scrapper
 
 COPY ./scrapper/poetry.lock ./scrapper/pyproject.toml /code/scrapper/
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH="/root/.local/bin:$PATH"
+RUN curl -sSL https://install.python-poetry.org | python3 - && \
+    export PATH="/root/.local/bin:$PATH"
+
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
 
 COPY . /code
-# EXPOSE 5000
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "poetry", "run", "python" ]
 CMD ["run_full_scrap.py"]
