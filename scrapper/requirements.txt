@@ -5,4 +5,4 @@ pandas==2.2.2
 flask==3.0.3
 inflect==7.3.1
 flask-sqlalchemy==3.1.1
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
