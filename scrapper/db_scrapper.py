@@ -1,9 +1,12 @@
 import os
 import csv
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 import re
 import logging
@@ -22,17 +25,24 @@ def scrap_race(season: int, race_number: int) -> bool:
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--remote-debugging-port=9222")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+
     driver = webdriver.Chrome(options=options)
+    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    
 
     try:
         driver.get(url)
+        wait = WebDriverWait(driver, 10)
+
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
 
         try:
             race_meta_info = soup.find(class_='raceMetaInfo')
-            print(race_meta_info)
             name_of_the_race = race_meta_info.find('h1').text.strip().replace('/', '').replace('  ', ' ')
+            print(name_of_the_race)
             splitted_name = [x.strip() for x in name_of_the_race.split(' ')]
             if len(splitted_name) == 1:
                 return False
