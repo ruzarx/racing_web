@@ -25,12 +25,6 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y chromium \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-RUN pip install --upgrade pip \
-    && pip install selenium beautifulsoup4 webdriver-manager
-
-RUN pip install -r requirements.txt
-
 # Set the display environment variable to allow headless operation
 ENV DISPLAY=:99
 
@@ -40,6 +34,10 @@ WORKDIR /app/scrapper
 # Copy your project files
 COPY . /app
 
+# Install Python dependencies
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
+    
 # Make sure the script is executable
 RUN chmod +x run_full_scrap.py
 
