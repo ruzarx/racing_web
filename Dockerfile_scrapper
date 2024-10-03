@@ -39,7 +39,7 @@ WORKDIR /app/scrapper
 COPY . /app
 
 # Make sure the script is executable
-RUN chmod +x your_scraper_script.py
+RUN chmod +x run_full_scrap.py
 
 # Command to run the scraping script
 CMD ["python", "./run_full_scrap.py"]
