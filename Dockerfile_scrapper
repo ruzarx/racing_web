@@ -1,33 +1,48 @@
-# FROM selenium/standalone-chrome
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
 
-# USER root
-# RUN wget https://bootstrap.pypa.io/get-pip.py
-# RUN python3 get-pip.py
-# RUN python3 -m pip install selenium
+# Set environment variables to prevent prompts from Chrome
+ENV DEBIAN_FRONTEND=noninteractive
 
+# Install necessary packages including Chrome and Selenium dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    curl \
+    gnupg \
+    libnss3 \
+    libgconf-2-4 \
+    libxss1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libx11-xcb1 \
+    libgbm-dev \
+    libpangocairo-1.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-FROM joyzoursky/python-chromedriver:3.9-selenium
+# Install Google Chrome
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir packages
-ADD requirements.txt packages
-RUN pip install -r packages/requirements.txt
+# Install Chrome WebDriver using webdriver_manager
+RUN pip install --upgrade pip \
+    && pip install selenium beautifulsoup4 webdriver-manager
 
-RUN mkdir -p /code
-WORKDIR /code/scrapper
+# Set the display environment variable to allow headless operation
+ENV DISPLAY=:99
 
-RUN apt-get update
-# RUN apt-get install python3-pip
+# Set working directory
+WORKDIR /app/scrapper
 
-# COPY ./scrapper/poetry.lock ./scrapper/pyproject.toml /code/scrapper/
-# COPY requirements.txt /code/
+# Copy your project files
+COPY . /app
 
-# RUN pip install -r requirements.txt
+# Make sure the script is executable
+RUN chmod +x your_scraper_script.py
 
-# RUN curl -sSL https://install.python-poetry.org | python3 -
-# ENV PATH="/root/.local/bin:$PATH"
-# RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
-
-COPY . /code
-CMD ["tail", "-f", "/dev/null"]
-# ENTRYPOINT [ "poetry", "run", "python" ]
-# CMD ["run_full_scrap.py"]
+# Command to run the scraping script
+CMD ["python", "./run_full_scrap.py"]
