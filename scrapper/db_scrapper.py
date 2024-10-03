@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def scrap_race(season: int, race_number: int) -> bool:
     url_race_number = str(race_number) if len(str(race_number)) == 2 else f"0{race_number}"
     url = f'https://www.racing-reference.info/race/{season}-{url_race_number}/W'
+    print(url)
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
@@ -30,6 +31,7 @@ def scrap_race(season: int, race_number: int) -> bool:
 
         try:
             race_meta_info = soup.find(class_='raceMetaInfo')
+            print(race_meta_info)
             name_of_the_race = race_meta_info.find('h1').text.strip().replace('/', '').replace('  ', ' ')
             splitted_name = [x.strip() for x in name_of_the_race.split(' ')]
             if len(splitted_name) == 1:
