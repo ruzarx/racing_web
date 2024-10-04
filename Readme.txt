@@ -11,3 +11,6 @@ Also, make sure that Chrome browser is installed on your system for JavaScript e
 Alternatively, if you are using Windows, the only requirement will be to have the Chrome web browser installed. Then you can launch the script using the scrap.exe file
 
 Make sure you have write permissions to the directory from which you are launching the script.
+
+
+python /app/scrapper/run_full_scrap.py

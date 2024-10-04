@@ -17,7 +17,82 @@ class DBWriter:
         self.app = app
         self.app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{postgres_connect_string}'
         self.db = SQLAlchemy(app)
+        self.create_tables()  # Automatically create tables if they don't exist
         return
+
+    def create_tables(self):
+        """Creates all the necessary tables if they don't already exist."""
+        with self.app.app_context():
+            # Define models that need to be created (only once, not loaded dynamically)
+            class NascarTrackData(self.db.Model):
+                __tablename__ = 'nascar_track_data'
+                id = self.db.Column(self.db.Integer, primary_key=True)
+                track_name = self.db.Column(self.db.String(255), nullable=False)
+                track_short_name = self.db.Column(self.db.String(255), nullable=False)
+                track_type = self.db.Column(self.db.String(255), nullable=False)
+                track_type_short = self.db.Column(self.db.String(255), nullable=False)
+
+            class NascarCalendar(self.db.Model):
+                __tablename__ = 'nascar_calendar'
+                id = self.db.Column(self.db.Integer, primary_key=True)
+                season_year = self.db.Column(self.db.Integer, nullable=False)
+                race_number = self.db.Column(self.db.Integer, nullable=False)
+                track_name = self.db.Column(self.db.String(255), nullable=False)
+                race_date = self.db.Column(self.db.Date, nullable=False)
+                season_stage = self.db.Column(self.db.String(255), nullable=False)
+
+            class NascarRaceData(self.db.Model):
+                __tablename__ = 'nascar_race_data'
+                id = self.db.Column(self.db.Integer, primary_key=True)
+                season_year = self.db.Column(self.db.Integer, nullable=False)
+                race_name = self.db.Column(self.db.String(255), nullable=False)
+                race_number = self.db.Column(self.db.Integer, nullable=False)
+                track_name = self.db.Column(self.db.String(255), nullable=False)
+                race_date = self.db.Column(self.db.Date, nullable=False)
+                cautions_number = self.db.Column(self.db.Integer, nullable=False)
+                green_flag_percent = self.db.Column(self.db.Float, nullable=False)
+                average_green_flag_run_laps = self.db.Column(self.db.Float, nullable=False)
+                number_of_leaders = self.db.Column(self.db.Integer, nullable=False)
+                average_leading_run_laps = self.db.Column(self.db.Float, nullable=False)
+                most_laps_led = self.db.Column(self.db.Integer, nullable=False)
+                most_laps_led_driver = self.db.Column(self.db.String(255), nullable=False)
+                most_laps_led_percent = self.db.Column(self.db.Float, nullable=False)
+
+            class NascarRaceResults(self.db.Model):
+                __tablename__ = 'nascar_race_results'
+                id = self.db.Column(self.db.Integer, primary_key=True)
+                season_year = self.db.Column(self.db.Integer, nullable=False)
+                race_number = self.db.Column(self.db.Integer, nullable=False)
+                driver_name = self.db.Column(self.db.String(255), nullable=False)
+                car_number = self.db.Column(self.db.String(255), nullable=False)
+                team_name = self.db.Column(self.db.String(255), nullable=False)
+                manufacturer = self.db.Column(self.db.String(255), nullable=False)
+                race_pos = self.db.Column(self.db.Integer, nullable=False)
+                quali_pos = self.db.Column(self.db.Integer, nullable=False)
+                stage_1_pos = self.db.Column(self.db.Integer, nullable=False)
+                stage_2_pos = self.db.Column(self.db.Integer, nullable=False)
+                laps_led = self.db.Column(self.db.Integer, nullable=False)
+                status = self.db.Column(self.db.String(255), nullable=False)
+                season_points = self.db.Column(self.db.Integer, nullable=False)
+                finish_position_points = self.db.Column(self.db.Integer, nullable=False)
+                stage_points = self.db.Column(self.db.Integer, nullable=False)
+                playoff_points = self.db.Column(self.db.Integer, nullable=False)
+
+            class NascarStandings(self.db.Model):
+                __tablename__ = 'nascar_standings'
+                id = self.db.Column(self.db.Integer, primary_key=True)
+                season_year = self.db.Column(self.db.Integer, nullable=False)
+                race_number = self.db.Column(self.db.Integer, nullable=False)
+                driver_name = self.db.Column(self.db.String(255), nullable=False)
+                race_season_points = self.db.Column(self.db.Integer, nullable=False)
+                wins = self.db.Column(self.db.Integer, nullable=False)
+                stage_wins = self.db.Column(self.db.Integer, nullable=False)
+                race_playoff_points = self.db.Column(self.db.Integer, nullable=False)
+                race_finish_points = self.db.Column(self.db.Integer, nullable=False)
+                race_stage_points = self.db.Column(self.db.Integer, nullable=False)
+
+            # Create all tables
+            self.db.create_all()
     
     def get_available_races(self) -> set:
         with self.app.app_context():
