@@ -13,7 +13,7 @@ from scrapper.db_connectors import DBReader
 app = Flask(__name__)
 app.jinja_env.filters['ordinal_suffix'] = inflect.engine().ordinal
 
-db_reader = DBReader(app, 'localhost/racing_data')
+db_reader = DBReader(app)
 
 @app.route('/')
 def index():
