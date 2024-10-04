@@ -1,19 +1,20 @@
 services:
-    
   scrapper:
-      build:
-        context: .
-        dockerfile: Dockerfile_scrapper
-      volumes:
-        - /:/home/jovyan/
-      restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile_scrapper
+    volumes:
+      - /:/home/jovyan/
+    restart: always
 
   webapp:
-      build:
-        context: .
-        dockerfile: Dockerfile_webapp
-      volumes:
-        - /:/home/jovyan/
+    build:
+      context: .
+      dockerfile: Dockerfile_webapp
+    volumes:
+      - /:/home/jovyan/
+    ports:
+      - "5000:5000"  # Map port 5000 on host to port 5000 in container
 
   postgres:
     image: postgres:latest
@@ -26,4 +27,3 @@ services:
       - "5432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      
