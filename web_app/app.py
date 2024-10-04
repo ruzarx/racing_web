@@ -15,6 +15,7 @@ app.jinja_env.filters['ordinal_suffix'] = inflect.engine().ordinal
 
 db_reader = DBReader(app)
 
+
 @app.route('/')
 def index():
     welcome_message = "Welcome to Racing Analytics!"

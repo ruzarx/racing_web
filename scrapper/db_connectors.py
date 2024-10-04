@@ -120,7 +120,7 @@ class DBWriter:
         return
     
     def fill_calendar_info(self) -> None:
-        from scrapper.nascar_calendars import calendar_2023, calendar_2024
+        from nascar_calendars import calendar_2023, calendar_2024
 
         with self.app.app_context():
             class CalendarTable(self.db.Model):
@@ -281,6 +281,29 @@ class DBReader:
                         "finish_position_points": result.finish_position_points,
                         "stage_points": result.stage_points,
                         "playoff_points": result.playoff_points,
+                     } for result in race_results
+                ]
+            
+    def get_season_standings_data(self, season: int, race_number: int) -> NascarRaceResultsObject:
+        with self.app.app_context():
+            class RaceStandingsTable(self.db.Model):
+                __tablename__ = 'nascar_standings'
+                __table_args__ = {'autoload_with': self.db.engine}
+
+            race_results = self.db.session.query(RaceStandingsTable).filter(
+                RaceStandingsTable.season_year == season, 
+                RaceStandingsTable.race_number <= race_number
+            ).all()
+            if race_results:
+                return [
+                    {
+                        "driver_name": result.driver_name,
+                        "wins": result.wins,
+                        "stage_wins": result.stage_wins,
+                        "race_stage_points": result.race_stage_points,
+                        "race_finish_points": result.race_finish_points,
+                        "race_season_points": result.race_season_points,
+                        "race_playoff_points": result.race_playoff_points,
                      } for result in race_results
                 ]
             
