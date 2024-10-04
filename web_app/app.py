@@ -36,7 +36,17 @@ def nascar():
         selected_race_number = 1
     raw_race_data = db_reader.get_race_data(selected_season, selected_race_number)
     raw_results = db_reader.get_race_results(selected_season, selected_race_number)
-    calendar_data = data_processing.compose_calendar_data(db_reader, int(selected_season))
+    raw_calendar_data = db_reader.get_calendar(selected_season)
+    calendar_data = data_processing.compose_calendar_data(raw_calendar_data)
+    raw_standings_data = db_reader.get_season_standings_data(selected_season, selected_race_number)
+    if raw_race_data is not None:
+        for race in raw_calendar_data:
+            if race['race_number'] == selected_race_number:
+                raw_race_data['season_stage'] = race['season_stage']
+                break
+    race_details = data_processing.compose_race_details(raw_results)
+    season_standings_data = data_processing.compose_season_standings_data(raw_standings_data)
+    playoff_standings_data = data_processing.compose_playoff_standings_data(raw_standings_data)
     if raw_results is not None:
         results = data_processing.compose_race_results(raw_results)
         raw_race_data['results'] = results
@@ -50,7 +60,10 @@ def nascar():
         calendar_data=calendar_data,
         selected_season=selected_season,
         selected_race=selected_race_number,
-        selected_race_data=selected_race_data
+        selected_race_data=selected_race_data,
+        selected_race_details=race_details,
+        season_standings=season_standings_data,
+        playoff_standings=playoff_standings_data,
     )
 
 

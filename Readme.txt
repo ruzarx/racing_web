@@ -14,3 +14,5 @@ Make sure you have write permissions to the directory from which you are launchi
 
 
 python /app/scrapper/run_full_scrap.py
+docker-compose exec postgres psql -U postgres -d racing_db
+\dt

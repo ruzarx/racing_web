@@ -63,19 +63,36 @@
                     mainTabContent.forEach(tc => tc.classList.remove('active'));
                     document.getElementById(tabId).classList.add('active');
         
-                    // If 'Race Results' tab is clicked, activate the first session tab
                     if (tabId === 'race-results') {
-                        const firstSessionTab = document.querySelector('.session-tab-link');
-                        if (firstSessionTab) {
-                            firstSessionTab.click(); 
+                        const raceSessionTab = document.querySelector('.session-tab-link[data-tab="Race"]');
+                        if (raceSessionTab && typeof selected_race_data !== 'undefined' && selected_race_data !== null) {
+                            raceSessionTab.click();
                         }
                     }
                 });
-            });
         
-            // Activate the first main tab by default
-            mainTabs[0].click();
+                // Activate the first main tab by default
+                const selectedRace = new URLSearchParams(window.location.search).get('race');
+                if (selectedRace) {
+                    // Activate the 'Race Results' main tab
+                    const raceResultsTab = document.querySelector('.main-tab-link[data-tab="race-results"]');
+                    if (raceResultsTab) {
+                        raceResultsTab.click();
+
+                        // Delay the activation of the "Race" session tab slightly
+                        setTimeout(() => {
+                            const raceSessionTab = document.querySelector('.session-tab-link[data-tab="Race"]');
+                            if (raceSessionTab) {
+                                raceSessionTab.click();
+                            }
+                        }, 100); // Adjust the delay if needed
+                    }
+                } else {
+                    // If no race is selected, activate the first main tab by default
+                    mainTabs[0].click();
+                }
         });
+    });
         </script>
         
 </body>

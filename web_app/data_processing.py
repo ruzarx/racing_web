@@ -14,15 +14,6 @@ from utils.tracks_to_types import tracks_to_types, tracks_to_short
 def fix_team_names(team_names: list) -> list:
     return [owners_to_teams[sponsor.split('(')[-1].strip(')')] for sponsor in team_names]
 
-def load_track_data(season: int, race_folder: str):
-    
-    race_name = track_data['Name of the race'].values[0][5:]
-    track_name = track_data['Location'].values[0].split(',')[0]
-    track_type = tracks_to_types[track_name] if track_name in tracks_to_types else "Unknown"
-    short_track_name = tracks_to_short[track_name] if track_name in tracks_to_short else "Unknown"
-    raw_race_date = track_data['Date'].values[0]
-    race_date = datetime.strptime(raw_race_date, "%A, %B %d, %Y").date()
-    return race_name, track_name, race_date, track_type, short_track_name
 
 def append_stage_data(stage_winners: list, race_results: pd.DataFrame):
     positions = []
@@ -49,82 +40,6 @@ def append_stage_data(stage_winners: list, race_results: pd.DataFrame):
             manufacturers
         )}
 
-def add_stage_results(race_results: pd.DataFrame, season: int, race_folder: str, current_results: dict):
-    stage_data = pd.read_csv(f'data/{season}/{race_folder}/top_10s.csv')
-    stage_1_winners = [int(res.strip('#')) for res in stage_data['Top 10 in Stage 1:'].values]
-    stage_2_winners = [int(res.strip('#')) for res in stage_data['Top 10 in Stage 2:'].values]
-    current_results['Stage 1'] = append_stage_data(stage_1_winners, race_results)
-    current_results['Stage 2'] = append_stage_data(stage_2_winners, race_results)
-    return current_results
-
-def load_race_results(season: int, race_folder: str):
-    race_results = pd.read_csv(f'data/{season}/{race_folder}/race_results.csv')
-    if race_results.shape[0] < 3:
-        return {'Qualification': {}, 'Race': {}, 'Stage 1': {}, 'Stage 2': {}}
-    race_results['St'] = race_results['St'].astype(int)
-    race_results['#'] = race_results['#'].astype(int)
-    race_results['Pos'] = race_results['Pos'].astype(int)
-    current_results = {}
-    current_results['Race'] = {
-            drivers: {
-            'position': positions,
-            'car_number': car_numbers,
-            'team': teams,
-            'manufacturer': manufacturers} for (drivers, positions, car_numbers, teams, manufacturers) in zip(
-                race_results.sort_values('Pos')['Driver'].to_list(),
-                race_results.sort_values('Pos')['Pos'].to_list(),
-                race_results.sort_values('Pos')['#'].to_list(),
-                fix_team_names(race_results.sort_values('Pos')['Sponsor / Owner'].to_list()),
-                race_results.sort_values('Pos')['Car'].to_list()
-            )}
-    
-    current_results = add_stage_results(race_results, season, race_folder, current_results)
-    
-    current_results['Qualification'] = {
-                drivers: {
-                'position': positions,
-                'car_number': car_numbers,
-                'team': teams,
-                'manufacturer': manufacturers} for (drivers, positions, car_numbers, teams, manufacturers) in zip(
-                    race_results.sort_values('St')['Driver'].to_list(),
-                    race_results.sort_values('St')['St'].to_list(),
-                    race_results.sort_values('St')['#'].to_list(),
-                    fix_team_names(race_results.sort_values('St')['Sponsor / Owner'].to_list()),
-                    race_results.sort_values('St')['Car'].to_list()
-                )}
-    return current_results
-
-
-
-def load_race(season_year: str, race_number: int):
-    race_name, track_name, race_date, track_type, short_track_name = load_track_data(season, race_folder)
-    current_results = load_race_results(season, race_folder)
-    current_race_data = {
-        "name": race_name,
-        "track": track_name,
-        "date": race_date,
-        "track_type": track_type,
-        "track_type_short": "".join([word[0] for word in track_type.split(' ')]),
-        "short_track": short_track_name,
-        "image": "daytona.png" if race_date < date.today() else "daytona_bw.png",
-        "results": current_results
-    }
-    return current_race_data
-
-    
-    
-
-def load_nascar_data(season_year: str, race_number: int):
-    current_race_data = load_race(season_year, race_number)
-    return current_race_data
-
-
-def calculate_statistics(driver_data):
-    # Calculate statistics (average finish, etc.)
-    # ...
-    pass
-
-
 def sort_months(month_name):
     month_order = {
         "January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6,
@@ -132,8 +47,8 @@ def sort_months(month_name):
     }
     return month_order[month_name]
 
-def compose_calendar_data(db_reader, selected_season: int):
-    calendar_data = db_reader.get_calendar(selected_season)
+def compose_calendar_data(calendar_data: dict):
+    
     calendar_data_dict = defaultdict(list)
     for race_info in calendar_data:
         month_name = race_info["race_date"].strftime("%B")
@@ -185,7 +100,7 @@ def compose_race_results(raw_race_results) -> dict:
                             'start_position': [res['quali_pos'] for res in raw_race_results],})
     quali_data = quali_data.sort_values(by=['start_position'], ascending=True)
 
-    results['Qualification'] = {
+    results['Qualifying'] = {
         drivers: {
             'position': positions,
             'car_number': car_numbers,
@@ -240,3 +155,131 @@ def compose_race_results(raw_race_results) -> dict:
         )}
     return results
 
+def compose_race_details(raw_results: dict) -> dict:
+    race_data = pd.DataFrame({'driver_name': [res['driver_name'] for res in raw_results],
+                              'race_pos': [res['race_pos'] for res in raw_results],
+                              'laps_led': [res['laps_led'] for res in raw_results],
+                              'status': [res['status'] for res in raw_results],
+                              'season_points': [res['season_points'] for res in raw_results],
+                              'finish_position_points': [res['finish_position_points'] for res in raw_results],
+                              'stage_points': [res['stage_points'] for res in raw_results],
+                              'playoff_points': [res['playoff_points'] for res in raw_results]})
+    race_data = race_data.sort_values(by=['race_pos'], ascending=True)
+
+    results = {}
+    results['Race Details'] = {
+        drivers: {
+            'position': positions,
+            'laps_led': laps_leds,
+            'status': statuses,
+            'season_points': season_pointses,
+            'finish_position_points': finish_position_pointses,
+            'stage_points': stage_pointses,
+            'playoff_points': playoff_pointses,
+        } for (drivers,
+               positions,
+               laps_leds,
+               statuses,
+               season_pointses,
+               finish_position_pointses,
+               stage_pointses,
+               playoff_pointses) in zip(
+                        race_data['driver_name'].tolist(),
+                        race_data['race_pos'].tolist(),
+                        race_data['laps_led'].tolist(),
+                        [status if status != 'running' else 'finished' for status in race_data['status'].tolist()],
+                        race_data['season_points'].tolist(),
+                        race_data['finish_position_points'].tolist(),
+                        race_data['stage_points'].tolist(),
+                        race_data['playoff_points'].tolist(),
+        )}
+    return results
+
+def compose_season_standings_data(raw_standings_data: dict) -> dict:
+    standings_data = pd.DataFrame({'driver_name': [res['driver_name'] for res in raw_standings_data],
+                                  'wins': [res['wins'] for res in raw_standings_data],
+                                  'stage_wins': [res['stage_wins'] for res in raw_standings_data],
+                                  'race_stage_points': [res['race_stage_points'] for res in raw_standings_data],
+                                  'race_finish_points': [res['race_finish_points'] for res in raw_standings_data],
+                                  'race_season_points': [res['race_season_points'] for res in raw_standings_data]})
+    standings_data = standings_data.groupby('driver_name', as_index=False).sum().reset_index(drop=True)
+    standings_data = standings_data.sort_values(by=['race_season_points'], ascending=False)
+    standings_data['pos'] = [x for x in range(1, len(standings_data) + 1)]
+
+    results = {}
+    results['Season_standings'] = {
+        drivers: {
+            'position': pos,
+            'wins': wins,
+            'stage_wins': stage_wins,
+            'race_stage_points': race_stage_points,
+            'race_finish_points': race_finish_points,
+            'race_season_points': race_season_points,
+            } for (drivers,
+               wins,
+               stage_wins,
+               race_stage_points,
+               race_finish_points,
+               race_season_points,
+               pos) in zip(
+                        standings_data['driver_name'].tolist(),
+                        standings_data['wins'].tolist(),
+                        standings_data['stage_wins'].tolist(),
+                        standings_data['race_stage_points'].tolist(),
+                        standings_data['race_finish_points'].tolist(),
+                        standings_data['race_season_points'].tolist(),
+                        standings_data['pos'].tolist(),
+               )
+    }
+    return results
+
+def compose_playoff_standings_data(raw_standings_data: dict) -> dict:
+    standings_data = pd.DataFrame({'driver_name': [res['driver_name'] for res in raw_standings_data],
+                                  'wins': [res['wins'] for res in raw_standings_data],
+                                  'stage_wins': [res['stage_wins'] for res in raw_standings_data],
+                                  'race_playoff_points': [res['race_playoff_points'] for res in raw_standings_data],
+                                  'race_season_points': [res['race_season_points'] for res in raw_standings_data]})
+    standings_data = standings_data.groupby('driver_name', as_index=False).sum()
+    standings_data = standings_data.sort_values(by=['wins', 'race_season_points'], ascending=False).reset_index(drop=True)
+    standings_data['pos'] = [x for x in range(1, len(standings_data) + 1)]
+
+    standings_data['point_gap_to_leader'] = standings_data['race_season_points'] - \
+        standings_data[standings_data['race_season_points'] == standings_data['race_season_points'].max()]['race_season_points'].tolist()[0]
+
+    standings_data['point_gap_to_leader'] = standings_data['point_gap_to_leader'].fillna(0).astype(int).astype(str)
+    standings_data.loc[standings_data['race_season_points'] == standings_data['race_season_points'].max(), 'point_gap_to_leader'] = 'Season leader'
+    standings_data.loc[standings_data['pos'] <= 16, 'point_gap_to_bubble'] = standings_data['race_season_points'] - standings_data[standings_data['pos'] == 17]['race_season_points'].tolist()[0]
+    standings_data.loc[standings_data['pos'] > 16, 'point_gap_to_bubble'] = standings_data['race_season_points'] - standings_data[standings_data['pos'] == 16]['race_season_points'].tolist()[0]
+    standings_data['point_gap_to_bubble'] = standings_data['point_gap_to_bubble'].astype(int)
+    standings_data.loc[standings_data['point_gap_to_bubble'] > 0, 'point_gap_to_bubble'] = '+' + standings_data[standings_data['point_gap_to_bubble'] > 0].astype(str)
+    standings_data.loc[standings_data['wins'] > 0, 'point_gap_to_bubble'] = 'Locked In'
+
+    results = {}
+    results['Playoff_standings'] = {
+        drivers: {
+            'position': pos,
+            'wins': wins,
+            'stage_wins': stage_wins,
+            'race_season_points': race_season_points,
+            'point_gap_to_leader': point_gap_to_leader,
+            'point_gap_to_bubble': point_gap_to_bubble,
+            'race_playoff_points': race_playoff_points,
+            } for (drivers,
+               wins,
+               stage_wins,
+               race_season_points,
+               point_gap_to_leader,
+               point_gap_to_bubble,
+               race_playoff_points,
+               pos) in zip(
+                        standings_data['driver_name'].tolist(),
+                        standings_data['wins'].tolist(),
+                        standings_data['stage_wins'].tolist(),
+                        standings_data['race_season_points'].tolist(),
+                        standings_data['point_gap_to_leader'].tolist(),
+                        standings_data['point_gap_to_bubble'].tolist(),
+                        standings_data['race_playoff_points'].tolist(),
+                        standings_data['pos'].tolist(),
+               )
+    }
+    return results
