@@ -6,7 +6,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-writer = DBWriter(app, 'postgres:postgres@localhost:5432/racing_db')
+writer = DBWriter(app, 'postgres:postgres@postgres:5432/racing_db')
 
 writer.fill_tracks_info()
 
