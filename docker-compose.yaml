@@ -6,6 +6,7 @@ services:
         dockerfile: Dockerfile_scrapper
       volumes:
         - /:/home/jovyan/
+      restart: always
 
   webapp:
       build:

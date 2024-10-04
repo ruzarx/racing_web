@@ -1,0 +1,2 @@
+# Run the Python script at 6 AM Moscow time on Saturday, Sunday, Monday, and Tuesday
+0 6 * * 6-2 TZ=Europe/Moscow /usr/local/bin/python /app/scrapper/run_full_scrap.py >> /var/log/cron.log 2>&1

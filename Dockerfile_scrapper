@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     libx11-xcb1 \
     libgbm-dev \
     libpangocairo-1.0-0 \
+    cron \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Chromium directly
@@ -41,5 +42,17 @@ RUN pip install --upgrade pip \
 # Make sure the script is executable
 RUN chmod +x run_full_scrap.py
 
-# Command to run the scraping script
-CMD ["python", "./run_full_scrap.py"]
+# Copy the cronjob file
+COPY crontab /etc/cron.d/scrapper-cron
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/scrapper-cron
+
+# Create the log file to be able to run tail
+RUN touch /var/log/cron.log
+
+# Ensure cron is started
+RUN crontab /etc/cron.d/scrapper-cron
+
+# Start cron and then run the Python script (run_full_scrap.py) at the desired times
+CMD cron && tail -f /var/log/cron.log
