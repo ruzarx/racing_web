@@ -15,7 +15,7 @@ from scrapper.nascar_dataclasses import NascarRaceDataObject, NascarRaceResultsO
 class DBWriter:
     def __init__(self, app: Flask, postgres_connect_string: str):
         self.app = app
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{postgres_connect_string}'
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@postgres:5432/racing_db"
         self.db = SQLAlchemy(app)
         self.create_tables()  # Automatically create tables if they don't exist
         return

@@ -6,21 +6,19 @@ from flask import Flask
 
 app = Flask(__name__)
 
-writer = DBWriter(app, 'postgres:postgres@postgres:5432/racing_db')
+writer = DBWriter(app)
 
 writer.fill_tracks_info()
 
 available_races = writer.get_available_races()
-print(available_races)
 
 writer.fill_calendar_info()
 
 season = 2024
 for season in (2023, 2024):
     for race_number in range(1, 40):
-        print(season, race_number)
         if (season, race_number) not in available_races:
-            print("started")
+            print(season, race_number)
             is_success = scrap_race(season, race_number)
             if not is_success:
                 break

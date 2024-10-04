@@ -6,6 +6,8 @@ services:
     volumes:
       - /:/home/jovyan/
     restart: always
+    depends_on:
+      - postgres
 
   webapp:
     build:
@@ -15,6 +17,8 @@ services:
       - /:/home/jovyan/
     ports:
       - "5000:5000"  # Map port 5000 on host to port 5000 in container
+    depends_on:
+      - postgres
 
   postgres:
     image: postgres:latest
