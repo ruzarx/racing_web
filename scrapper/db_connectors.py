@@ -15,8 +15,8 @@ from scrapper.nascar_dataclasses import NascarRaceDataObject, NascarRaceResultsO
 class DBWriter:
     def __init__(self, app: Flask):
         self.app = app
-        # self.app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@postgres:5432/racing_db"
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://localhost/racing_data"
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@postgres:5432/racing_db"
+        # self.app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://localhost/racing_data"
         self.db = SQLAlchemy(app)
         self.create_tables()  # Automatically create tables if they don't exist
         return
@@ -227,8 +227,8 @@ class DBWriter:
 class DBReader:
     def __init__(self, app: Flask):
         self.app = app
-        # self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@postgres:5432/racing_db'
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/racing_data'
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@postgres:5432/racing_db'
+        # self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/racing_data'
         
         self.db = SQLAlchemy(app)
         return
