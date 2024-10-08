@@ -33,66 +33,60 @@
     </footer>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            setupMainTabs();
+            setupSessionTabs();
+        });
+
+        function setupMainTabs() {
             const mainTabs = document.querySelectorAll('.main-tab-link');
             const mainTabContent = document.querySelectorAll('.tab');
-        
-            // Event delegation for session tabs
-            document.addEventListener('click', (event) => {
-                if (event.target.classList.contains('session-tab-link')) {
-                    const tabId = event.target.dataset.tab;
-        
-                    // Deactivate all session tabs
-                    document.querySelectorAll('.session-tab-link').forEach(t => t.classList.remove('active'));
-                    // Activate the clicked tab
-                    event.target.classList.add('active');
-        
-                    // Hide all session tab content
-                    document.querySelectorAll('.session-tab').forEach(tc => tc.classList.remove('active'));
-                    // Show the content for the clicked tab
-                    document.getElementById(tabId).classList.add('active');
-                }
-            });
-        
+            
             mainTabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabId = tab.dataset.tab;
-        
                     mainTabs.forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
-        
                     mainTabContent.forEach(tc => tc.classList.remove('active'));
                     document.getElementById(tabId).classList.add('active');
-        
+
+                    // Automatically trigger the "Race" subtab when "Race Results" tab is clicked
                     if (tabId === 'race-results') {
                         const raceSessionTab = document.querySelector('.session-tab-link[data-tab="Race"]');
-                        if (raceSessionTab && typeof selected_race_data !== 'undefined' && selected_race_data !== null) {
+                        if (raceSessionTab) {
                             raceSessionTab.click();
                         }
                     }
                 });
-        
-                // Activate the first main tab by default
-                const selectedRace = new URLSearchParams(window.location.search).get('race');
-                if (selectedRace) {
-                    // Activate the 'Race Results' main tab
-                    const raceResultsTab = document.querySelector('.main-tab-link[data-tab="race-results"]');
-                    if (raceResultsTab) {
-                        raceResultsTab.click();
+            });
 
-                        // Delay the activation of the "Race" session tab slightly
-                        setTimeout(() => {
-                            const raceSessionTab = document.querySelector('.session-tab-link[data-tab="Race"]');
-                            if (raceSessionTab) {
-                                raceSessionTab.click();
-                            }
-                        }, 100); // Adjust the delay if needed
-                    }
-                } else {
-                    // If no race is selected, activate the first main tab by default
-                    mainTabs[0].click();
+            const selectedRace = new URLSearchParams(window.location.search).get('race');
+            if (selectedRace) {
+                const raceResultsTab = document.querySelector('.main-tab-link[data-tab="race-results"]');
+                if (raceResultsTab) {
+                    raceResultsTab.click();
+                    setTimeout(() => {
+                        const raceSessionTab = document.querySelector('.session-tab-link[data-tab="Race"]');
+                        if (raceSessionTab) {
+                            raceSessionTab.click();
+                        }
+                    }, 100); // Adjust the delay if needed
                 }
-        });
-    });
+            } else {
+                mainTabs[0].click();
+            }
+        }
+
+        function setupSessionTabs() {
+            document.addEventListener('click', (event) => {
+                if (event.target.classList.contains('session-tab-link')) {
+                    const tabId = event.target.dataset.tab;
+                    document.querySelectorAll('.session-tab-link').forEach(t => t.classList.remove('active'));
+                    event.target.classList.add('active');
+                    document.querySelectorAll('.session-tab').forEach(tc => tc.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                }
+            });
+        }
         </script>
         
 </body>

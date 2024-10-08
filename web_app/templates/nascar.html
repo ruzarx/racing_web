@@ -42,11 +42,11 @@
         {% if selected_race_data.season_stage == "season" %}
         <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - {{ selected_race|ordinal_suffix }} (of 26) race of the season</h5>
         {% elif selected_race_data.season_stage == "playoff_16" %}
-        <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - {{ (29 - selected_race)|ordinal_suffix }} (of 3) race of the round of 16</h5>
+        <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - {{ ((selected_race|int - 26)|string)|ordinal_suffix }} (of 3) race of the round of 16</h5>
         {% elif selected_race_data.season_stage == "playoff_12" %}
-        <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - {{ (32 - selected_race)|ordinal_suffix }} (of 3) race of the round of 12</h5>
+        <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - {{ ((selected_race|int - 29)|string)|ordinal_suffix }} (of 3) race of the round of 12</h5>
         {% elif selected_race_data.season_stage == "playoff_8" %}
-        <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - {{ (35 - selected_race)|ordinal_suffix }} (of 3) race of the round of 8</h5>
+        <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - {{ ((selected_race|int - 32)|string)|ordinal_suffix }} (of 3) race of the round of 8</h5>
         {% elif selected_race_data.season_stage == "playoff_4" %}
         <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - Championship Final</h5>
         {% endif %}
@@ -66,10 +66,40 @@
                     <li class="session-tab-link" data-tab="Stage 2">Stage 2</li>
                 </ul>
 
-            <div class="session-tab-content">
-                {% if selected_race %}
-                    {% for session, results in selected_race_data.results.items() %}
-                        <div id="{{ session }}" class="session-tab">
+                <div class="session-tab-content">
+                    {% if selected_race %}
+                        {% if selected_race_data.results and selected_race_data.results|length > 0 %}
+                            <div id="Race" class="session-tab {% if active_tab == 'Race' %}active{% endif %}">
+                                <h4>Race Results</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Position</th>
+                                            <th>Driver</th>
+                                            <th>Car Number</th>
+                                            <th>Team</th>
+                                            <th>Make</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for driver, rest_data in selected_race_data.results.Race.items() %}
+                                            <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
+                                                <td>{{ rest_data.position }}</td>
+                                                <td>{{ driver }}</td>
+                                                <td>{{ rest_data.car_number }}</td>
+                                                <td>{{ rest_data.team }}</td>
+                                                <td>{{ rest_data.make }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p>This race has not yet occurred. Results will be available once the race is completed.</p>
+                        {% endif %}
+                    
+                        <div id="Qualifying" class="session-tab {% if active_tab == 'Qualifying' %}active{% endif %}">
+                            <h4>Qualifying Results</h4>
                             <table>
                                 <thead>
                                     <tr>
@@ -81,8 +111,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for driver, rest_data in results.items() %}
-                                        <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %} class="top-ten"{% endif %}>
+                                    {% for driver, rest_data in selected_race_data.results.Qualifying.items() %}
+                                        <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
                                             <td>{{ rest_data.position }}</td>
                                             <td>{{ driver }}</td>
                                             <td>{{ rest_data.car_number }}</td>
@@ -93,16 +123,63 @@
                                 </tbody>
                             </table>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <div id="Race" class="session-tab">
-                        <p>Please select a race from the side panel to view results.</p>
-                    </div>
-                    <div id="Qualifying" class="session-tab" style="display: none;"></div> {# Hidden by default #}
-                    <div id="Stage 1" class="session-tab" style="display: none;"></div> {# Hidden by default #}
-                    <div id="Stage 2" class="session-tab" style="display: none;"></div> {# Hidden by default #}
-                {% endif %}
-            </div>
+                    
+                        <div id="Stage 1" class="session-tab {% if active_tab == 'Stage 1' %}active{% endif %}">
+                            <h4>Stage 1 Results</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Driver</th>
+                                        <th>Car Number</th>
+                                        <th>Team</th>
+                                        <th>Make</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for driver, rest_data in selected_race_data.results['Stage 1'].items() %}
+                                        <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
+                                            <td>{{ rest_data.position }}</td>
+                                            <td>{{ driver }}</td>
+                                            <td>{{ rest_data.car_number }}</td>
+                                            <td>{{ rest_data.team }}</td>
+                                            <td>{{ rest_data.make }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                
+                        <div id="Stage 2" class="session-tab {% if active_tab == 'Stage 2' %}active{% endif %}">
+                            <h4>Stage 2 Results</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Driver</th>
+                                        <th>Car Number</th>
+                                        <th>Team</th>
+                                        <th>Make</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for driver, rest_data in selected_race_data.results['Stage 2'].items() %}
+                                        <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
+                                            <td>{{ rest_data.position }}</td>
+                                            <td>{{ driver }}</td>
+                                            <td>{{ rest_data.car_number }}</td>
+                                            <td>{{ rest_data.team }}</td>
+                                            <td>{{ rest_data.make }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>Please select a race to view results.</p>
+                    {% endif %}
+                </div>                        
+                
         </div>
         <div id="race-details" class="tab">
             {% if selected_race %}
@@ -156,7 +233,30 @@
                         </thead>
                         <tbody>
                             {% for driver, rest_data in results.items() %}
-                                <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %} class="top-ten"{% endif %}>
+                                <tr 
+                                    {% if rest_data.position == 1 %}class="winner"{% endif %}
+                                    {% if selected_race|int <= 26 %}
+                                        {% if rest_data.position <= 10 %}
+                                            class="top-ten"
+                                        {% endif %}
+                                    {% elif 27 <= selected_race|int <= 29 %}
+                                        {% if rest_data.position <= 16 %}
+                                            class="top-ten"
+                                        {% endif %}
+                                    {% elif 30 <= selected_race|int <= 32 %}
+                                        {% if rest_data.position <= 12 %}
+                                            class="top-ten"
+                                        {% endif %}
+                                    {% elif 33 <= selected_race|int <= 35 %}
+                                        {% if rest_data.position <= 8 %}
+                                            class="top-ten"
+                                        {% endif %}
+                                    {% elif selected_race|int == 36 %}
+                                        {% if rest_data.position == 1 %}
+                                            class="top-ten"
+                                        {% endif %}
+                                    {% endif %}
+                                >
                                     <td>{{ rest_data.position }}</td>
                                     <td>{{ driver }}</td>
                                     <td>{{ rest_data.wins }}</td>
@@ -166,7 +266,7 @@
                                     <td>{% if rest_data.race_season_points > 0 %}{{ rest_data.race_season_points }}{% else %}0{% endif %}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
+                        </tbody>                        
                     </table>
                 {% endfor %}
             {% endif %}
@@ -190,11 +290,36 @@
                         </thead>
                         <tbody>
                             {% for driver, rest_data in results.items() %}
-                                <tr 
-                                    {% if rest_data.position == 1 %}class="winner"
-                                    {% elif 2 <= rest_data.position <= 16 %} class="top-ten"
+                                <tr
+                                    {% if rest_data.position == 1 %}class="winner"{% endif %}
+                                    {% if selected_race|int <= 26 %}
+                                        {% if 16 < rest_data.position <= 20 %}
+                                        class="playoff-contender"
+                                    {% elif rest_data.position <= 16 %}
+                                        class="top-ten"
                                     {% endif %}
-                                    {% if rest_data.wins == 0 %}class="locked-in"
+                                    {% elif 27 <= selected_race|int <= 29 %}
+                                        {% if 12 < rest_data.position <= 16 %}
+                                            class="playoff-contender"
+                                        {% elif rest_data.position <= 12 %}
+                                            class="top-ten"
+                                        {% endif %}
+                                    {% elif 30 <= selected_race|int <= 32 %}
+                                        {% if 8 < rest_data.position <= 12 %}
+                                            class="playoff-contender"
+                                        {% elif rest_data.position <= 8 %}
+                                            class="top-ten"
+                                        {% endif %}
+                                    {% elif 33 <= selected_race|int <= 35 %}
+                                        {% if 4 < rest_data.position <= 8 %}
+                                            class="playoff-contender"
+                                        {% elif rest_data.position <= 4 %}
+                                            class="top-ten"
+                                        {% endif %}
+                                    {% elif selected_race|int == 36 %}
+                                        {% if rest_data.position == 1 %}
+                                            class="champion"
+                                        {% endif %}
                                     {% endif %}
                                 >
                                     <td>{{ rest_data.position }}</td>
@@ -207,7 +332,7 @@
                                     <td>{{ rest_data.race_playoff_points }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
+                        </tbody>                                          
                     </table>
                 {% endfor %}
             {% endif %}

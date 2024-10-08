@@ -45,16 +45,23 @@ def nascar():
             if race['race_number'] == selected_race_number:
                 raw_race_data['season_stage'] = race['season_stage']
                 break
-    race_details = data_processing.compose_race_details(raw_results)
-    season_standings_data = data_processing.compose_season_standings_data(raw_standings_data)
-    playoff_standings_data = data_processing.compose_playoff_standings_data(raw_standings_data)
     if raw_results is not None:
+        race_details = data_processing.compose_race_details(raw_results)
         results = data_processing.compose_race_results(raw_results)
+        season_standings_data = data_processing.compose_season_standings_data(raw_standings_data,
+                                                                              selected_race_number,
+                                                                              selected_season)
+        playoff_standings_data = data_processing.compose_playoff_standings_data(raw_standings_data,
+                                                                                selected_race_number,
+                                                                                selected_season)
         raw_race_data['results'] = results
         selected_race_data = raw_race_data
     else:
         selected_race_data = None
         selected_race_number = None
+        race_details = None
+        season_standings_data = None
+        playoff_standings_data = None
 
     return render_template(
         'nascar.html',
@@ -78,4 +85,4 @@ def wec():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    app.run(debug=True, port=5003, host='0.0.0.0')

@@ -15,7 +15,8 @@ from scrapper.nascar_dataclasses import NascarRaceDataObject, NascarRaceResultsO
 class DBWriter:
     def __init__(self, app: Flask):
         self.app = app
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@postgres:5432/racing_db"
+        # self.app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@postgres:5432/racing_db"
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://localhost/racing_data"
         self.db = SQLAlchemy(app)
         self.create_tables()  # Automatically create tables if they don't exist
         return
@@ -26,27 +27,25 @@ class DBWriter:
             # Define models that need to be created (only once, not loaded dynamically)
             class NascarTrackData(self.db.Model):
                 __tablename__ = 'nascar_track_data'
-                id = self.db.Column(self.db.Integer, primary_key=True)
-                track_name = self.db.Column(self.db.String(255), nullable=False)
+                track_name = self.db.Column(self.db.String(255), nullable=False, primary_key=True)
                 track_short_name = self.db.Column(self.db.String(255), nullable=False)
                 track_type = self.db.Column(self.db.String(255), nullable=False)
                 track_type_short = self.db.Column(self.db.String(255), nullable=False)
+                track_length_mi = self.db.Column(self.db.String(255), nullable=True)
 
             class NascarCalendar(self.db.Model):
                 __tablename__ = 'nascar_calendar'
-                id = self.db.Column(self.db.Integer, primary_key=True)
-                season_year = self.db.Column(self.db.Integer, nullable=False)
-                race_number = self.db.Column(self.db.Integer, nullable=False)
+                season_year = self.db.Column(self.db.Integer, nullable=False, primary_key=True)
+                race_number = self.db.Column(self.db.Integer, nullable=False, primary_key=True)
                 track_name = self.db.Column(self.db.String(255), nullable=False)
                 race_date = self.db.Column(self.db.Date, nullable=False)
                 season_stage = self.db.Column(self.db.String(255), nullable=False)
 
             class NascarRaceData(self.db.Model):
                 __tablename__ = 'nascar_race_data'
-                id = self.db.Column(self.db.Integer, primary_key=True)
-                season_year = self.db.Column(self.db.Integer, nullable=False)
+                season_year = self.db.Column(self.db.Integer, nullable=False, primary_key=True)
+                race_number = self.db.Column(self.db.Integer, nullable=False, primary_key=True)
                 race_name = self.db.Column(self.db.String(255), nullable=False)
-                race_number = self.db.Column(self.db.Integer, nullable=False)
                 track_name = self.db.Column(self.db.String(255), nullable=False)
                 race_date = self.db.Column(self.db.Date, nullable=False)
                 cautions_number = self.db.Column(self.db.Integer, nullable=False)
@@ -60,10 +59,9 @@ class DBWriter:
 
             class NascarRaceResults(self.db.Model):
                 __tablename__ = 'nascar_race_results'
-                id = self.db.Column(self.db.Integer, primary_key=True)
-                season_year = self.db.Column(self.db.Integer, nullable=False)
-                race_number = self.db.Column(self.db.Integer, nullable=False)
-                driver_name = self.db.Column(self.db.String(255), nullable=False)
+                season_year = self.db.Column(self.db.Integer, nullable=False, primary_key=True)
+                race_number = self.db.Column(self.db.Integer, nullable=False, primary_key=True)
+                driver_name = self.db.Column(self.db.String(255), nullable=False, primary_key=True)
                 car_number = self.db.Column(self.db.String(255), nullable=False)
                 team_name = self.db.Column(self.db.String(255), nullable=False)
                 manufacturer = self.db.Column(self.db.String(255), nullable=False)
@@ -71,6 +69,7 @@ class DBWriter:
                 quali_pos = self.db.Column(self.db.Integer, nullable=False)
                 stage_1_pos = self.db.Column(self.db.Integer, nullable=False)
                 stage_2_pos = self.db.Column(self.db.Integer, nullable=False)
+                stage_3_pos = self.db.Column(self.db.Integer, nullable=False)
                 laps_led = self.db.Column(self.db.Integer, nullable=False)
                 status = self.db.Column(self.db.String(255), nullable=False)
                 season_points = self.db.Column(self.db.Integer, nullable=False)
@@ -80,10 +79,9 @@ class DBWriter:
 
             class NascarStandings(self.db.Model):
                 __tablename__ = 'nascar_standings'
-                id = self.db.Column(self.db.Integer, primary_key=True)
-                season_year = self.db.Column(self.db.Integer, nullable=False)
-                race_number = self.db.Column(self.db.Integer, nullable=False)
-                driver_name = self.db.Column(self.db.String(255), nullable=False)
+                season_year = self.db.Column(self.db.Integer, nullable=False, primary_key=True)
+                race_number = self.db.Column(self.db.Integer, nullable=False, primary_key=True)
+                driver_name = self.db.Column(self.db.String(255), nullable=False, primary_key=True)
                 race_season_points = self.db.Column(self.db.Integer, nullable=False)
                 wins = self.db.Column(self.db.Integer, nullable=False)
                 stage_wins = self.db.Column(self.db.Integer, nullable=False)
@@ -185,6 +183,7 @@ class DBWriter:
                     quali_pos=data.quali_pos,
                     stage_1_pos=data.stage_1_pos,
                     stage_2_pos=data.stage_2_pos,
+                    stage_3_pos=data.stage_3_pos,
                     laps_led=data.laps_led,
                     status=data.status,
                     season_points=data.season_points,
@@ -228,7 +227,9 @@ class DBWriter:
 class DBReader:
     def __init__(self, app: Flask):
         self.app = app
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@postgres:5432/racing_db'
+        # self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@postgres:5432/racing_db'
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/racing_data'
+        
         self.db = SQLAlchemy(app)
         return
     
@@ -257,7 +258,7 @@ class DBReader:
                     "race_date": race_data[0][0].race_date,
                 }
             
-    def get_race_results(self, season: int, race_number: int) -> NascarRaceResultsObject:
+    def get_race_results(self, season: int, race_number: int) -> list:
         with self.app.app_context():
             class RaceResultsTable(self.db.Model):
                 __tablename__ = 'nascar_race_results'
@@ -275,6 +276,7 @@ class DBReader:
                         "quali_pos": result.quali_pos,
                         "stage_1_pos": result.stage_1_pos,
                         "stage_2_pos": result.stage_2_pos,
+                        "stage_3_pos": result.stage_3_pos,
                         "laps_led": result.laps_led,
                         "status": result.status,
                         "season_points": result.season_points,
@@ -304,6 +306,7 @@ class DBReader:
                         "race_finish_points": result.race_finish_points,
                         "race_season_points": result.race_season_points,
                         "race_playoff_points": result.race_playoff_points,
+                        "race_number": result.race_number,
                      } for result in race_results
                 ]
             

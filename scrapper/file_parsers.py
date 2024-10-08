@@ -81,7 +81,7 @@ class NascarResultsParser:
     def fill_results_data(self):
         results_data = pd.read_csv(f'data/{self.season}/{self.race_number}/race_results.csv')
         stages_results = self._load_stage_data()
-        results_data = results_data.merge(stages_results, on='#', how='outer').fillna(0).sort_values('Pos', ascending=True)
+        results_data = results_data.merge(stages_results, on='#', how='left').fillna(0).sort_values('Pos', ascending=True)
         
         driver_names = results_data['Driver'].values
         car_numbers = [int(number) for number in results_data['#'].values]
@@ -91,16 +91,19 @@ class NascarResultsParser:
         quali_pos = [int(pos) for pos in results_data['St'].values]
         stage_1_pos = [int(pos) for pos in results_data['stage_1_pos'].values]
         stage_2_pos = [int(pos) for pos in results_data['stage_2_pos'].values]
+        stage_3_pos = [int(pos) for pos in results_data['stage_3_pos'].values]
         laps_leds = [int(laps) for laps in results_data['Led'].values]
         statuses = results_data['Status'].values
-        season_points = [int(pts) for pts in results_data['Pts'].values]
         playoff_points = [int(pts) for pts in results_data['PPts'].values]
         finish_position_points = [40] + list(range(35, 0, -1)) + [1] * (results_data.shape[0] - 36)
-        stage_points = [int(pts) for pts in (results_data['Pts'].values - np.array(finish_position_points))]
+        stage_points = [int(pts) for pts in (results_data['stage_1_pts'].values + \
+                                             results_data['stage_2_pts'].values + \
+                                             results_data['stage_3_pts'].values)]
+        season_points = [finish + stage for finish, stage in zip(finish_position_points, stage_points)]
         wins = [1 if pos == 1 else 0 for pos in race_pos]
-        stage_wins = [2 if (pos_stage_1 == 1) and (pos_stage_2 == 1) \
-                    else 1 if (pos_stage_1 == 1) or (pos_stage_2 == 1) \
-                        else 0 for pos_stage_1, pos_stage_2 in zip(stage_1_pos, stage_2_pos)]
+        stage_wins = [(pos_stage_1 == 1) + \
+                      (pos_stage_2 == 1) + \
+                      (pos_stage_3 == 1) for pos_stage_1, pos_stage_2, pos_stage_3 in zip(stage_1_pos, stage_2_pos, stage_3_pos)]
         race_results = []
         for i in range(results_data.shape[0]):
             race_results_row = NascarRaceResultsObject()
@@ -114,6 +117,7 @@ class NascarResultsParser:
             race_results_row.quali_pos = quali_pos[i]
             race_results_row.stage_1_pos = stage_1_pos[i]
             race_results_row.stage_2_pos = stage_2_pos[i]
+            race_results_row.stage_3_pos = stage_3_pos[i]
             race_results_row.laps_led = laps_leds[i]
             race_results_row.status = statuses[i]
             race_results_row.season_points = season_points[i]
@@ -144,8 +148,11 @@ class NascarResultsParser:
         stage_data = pd.read_csv(f'data/{self.season}/{self.race_number}/top_10s.csv')
         stage_1 = [int(number.strip('#')) for number in stage_data["Top 10 in Stage 1:"].values]
         stage_2 = [int(number.strip('#')) for number in stage_data["Top 10 in Stage 2:"].values]
-        stage_1_df = pd.DataFrame({'#': stage_1, 'stage_1_pos': list(range(1, 11))})
-        stage_2_df = pd.DataFrame({'#': stage_2, 'stage_2_pos': list(range(1, 11))})
+        stage_3 = [int(number.strip('#')) if type(number) != float else 1000 for number in stage_data["Top 10 in Stage 3:"].tolist()]
+        stage_1_df = pd.DataFrame({'#': stage_1, 'stage_1_pos': list(range(1, 11)), 'stage_1_pts': list(range(10, 0, -1))})
+        stage_2_df = pd.DataFrame({'#': stage_2, 'stage_2_pos': list(range(1, 11)), 'stage_2_pts': list(range(10, 0, -1))})
+        stage_3_df = pd.DataFrame({'#': stage_3, 'stage_3_pos': list(range(1, 11)), 'stage_3_pts': list(range(10, 0, -1))})
         stages_results = stage_1_df.merge(stage_2_df, on='#', how='outer')
+        stages_results = stages_results.merge(stage_3_df, on='#', how='outer')
         return stages_results
     

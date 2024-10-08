@@ -30,6 +30,7 @@ class NascarRaceResultsObject:
     quali_pos: int
     stage_1_pos: int
     stage_2_pos: int
+    stage_3_pos: int
     laps_led: int
     status: str
     season_points: int

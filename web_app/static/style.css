@@ -2,6 +2,7 @@ body {
     font-family: sans-serif;
     flex: 1;
     margin: 0;
+    font-size: 16px;
     background-color: #ffffff; /* Light gray background for better contrast */
     color: #333;                /* Darker text for readability */
 }
@@ -33,6 +34,7 @@ main {
     flex: 1;
     background-color: #75a1ed;     /* White background for content */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
 }
 
 footer {
@@ -72,6 +74,14 @@ footer {
 }
 
 .tab.active {
+    display: block;
+}
+
+.tab, .session-tab {
+    display: none;
+}
+
+.tab.active, .session-tab.active {
     display: block;
 }
 
@@ -117,15 +127,21 @@ table {
 }
 
 th, td {
-    border: 1px solid #ccc;  /* Light gray border */
-    padding: 0.8rem;        /* More padding for better readability */
+    border: 1px solid #ddd; /* Use a lighter border for a cleaner look */
+    padding: 1rem;        /* More padding for better readability */
     text-align: center;     /* Center align text within cells */
 }
 
-/* Zebra striping for rows */
+/* Light gray for even rows (already applied) */
 tbody tr:nth-child(even) {
-    background-color: #f8f8f8; /* Alternate background color for even rows */
+    background-color: #f8f8f8; /* Light gray background */
 }
+
+/* Dimmed blue for odd rows */
+tbody tr:nth-child(odd) {
+    background-color: #e6f0ff; /* Light blue background (dimmed) */
+}
+
 
 /* Table header styles */
 thead {
@@ -146,57 +162,53 @@ td {
     text-align: center;
 }
 
-/* Zebra striping for rows */
-tbody tr:nth-child(even) {
-    background-color: #f8f8f8;
-}
-
-.winner {
-    background-color: #FFD700; /* Light blue background for the winner */
+tbody tr.winner {
+    background-color: #FFD700; /* Gold background for the winner */
     font-weight: bold;
 }
 
 /* Alternate background colors for top-ten rows */
-tbody tr.top-ten:nth-child(even) {
-    background-color: #fff9c4; /* Light yellow background */
+tr.top-ten:nth-child(even) {
+    background-color: #fff59d; /* Light yellow background */
 }
 
-tbody tr.top-ten:nth-child(odd) {
-    background-color: #fff59d; /* Slightly darker yellow */
+tr.top-ten:nth-child(odd) {
+    background-color: #f9ed7c; /* Same background for consistency */
 }
 
-/* Alternate background colors for the rest of the field */
-tbody tr:not(.winner):not(.top-ten):nth-child(even) {
-    background-color: #f5f5f5; /* Light gray background */
+/* Highlight for playoff contenders */
+tr.playoff-contender:nth-child(even) {
+    background-color: #f5e0e2; /* Light green background */
 }
 
-tbody tr:not(.winner):not(.top-ten):nth-child(odd) {
-    background-color: #eeeeee; /* Slightly darker gray */
+tr.playoff-contender:nth-child(odd) {
+    background-color: #f8d5d8; /* Light green background */
 }
 
-
-/* .side-panel ul ul li a.playoff-race {
+/* Highlight for the champion */
+tbody tr.champion {
+    background-color: #FFD700; /* Gold background for the champion */
     font-weight: bold;
-} */
+}
 
+/* For playoff stages (Round of 16, 12, 8, etc.) */
 .side-panel ul ul li a.playoff-16 {
-    color: #45b31275; /* Red */
+    color: #45b312; /* Adjusted green for better visibility */
 }
 
 .side-panel ul ul li a.playoff-12 {
-    color: #b6a618; /* Orange */
+    color: #b6a618; /* Yellow-orange, good contrast */
 }
 
 .side-panel ul ul li a.playoff-8 {
-    color: #ea933c; /* Yellow */
+    color: #ea933c; /* Yellow-orange */
 }
 
 .side-panel ul ul li a.playoff-4 {
-    color: #990707; /* Green */
+    color: #990707; /* Dark red */
 }
 
-
-
+/* Main tab styles */
 .main-tabs {
     list-style: none;
     margin: 0;
@@ -221,8 +233,9 @@ tbody tr:not(.winner):not(.top-ten):nth-child(odd) {
     color: white;
 }
 
-.main-tab-link:hover {
-    background-color: #e0e0e0;
+.main-tab-link:hover,
+.session-tab-link:hover {
+    background-color: #0056b3; /* A slightly darker shade of blue for hover */
 }
 
 /* Styles for the session tabs within Race Results */

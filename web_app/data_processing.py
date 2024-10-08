@@ -10,6 +10,7 @@ import pandas as pd
 from utils.owners_to_teams import owners_to_teams
 from utils.tracks_to_types import tracks_to_types, tracks_to_short
 
+from standings_calculation import standings_calculation
 
 def fix_team_names(team_names: list) -> list:
     return [owners_to_teams[sponsor.split('(')[-1].strip(')')] for sponsor in team_names]
@@ -195,15 +196,18 @@ def compose_race_details(raw_results: dict) -> dict:
         )}
     return results
 
-def compose_season_standings_data(raw_standings_data: dict) -> dict:
-    standings_data = pd.DataFrame({'driver_name': [res['driver_name'] for res in raw_standings_data],
-                                  'wins': [res['wins'] for res in raw_standings_data],
-                                  'stage_wins': [res['stage_wins'] for res in raw_standings_data],
-                                  'race_stage_points': [res['race_stage_points'] for res in raw_standings_data],
-                                  'race_finish_points': [res['race_finish_points'] for res in raw_standings_data],
-                                  'race_season_points': [res['race_season_points'] for res in raw_standings_data]})
-    standings_data = standings_data.groupby('driver_name', as_index=False).sum().reset_index(drop=True)
-    standings_data = standings_data.sort_values(by=['race_season_points'], ascending=False)
+def compose_season_standings_data(raw_data: dict, race_number: str, current_season: str) -> dict:
+    raw_standings_data = pd.DataFrame({'driver_name': [res['driver_name'] for res in raw_data],
+                                  'wins': [res['wins'] for res in raw_data],
+                                  'stage_wins': [res['stage_wins'] for res in raw_data],
+                                  'race_stage_points': [res['race_stage_points'] for res in raw_data],
+                                  'race_finish_points': [res['race_finish_points'] for res in raw_data],
+                                  'race_season_points': [res['race_season_points'] for res in raw_data],
+                                  'initial_season_points': [res['race_season_points'] for res in raw_data],
+                                  'race_number': [res['race_number'] for res in raw_data]})
+    
+    standings_data = standings_calculation(raw_standings_data, int(race_number), int(current_season))
+    standings_data = standings_data.sort_values(by=['season_points'], ascending=False)
     standings_data['pos'] = [x for x in range(1, len(standings_data) + 1)]
 
     results = {}
@@ -227,32 +231,40 @@ def compose_season_standings_data(raw_standings_data: dict) -> dict:
                         standings_data['stage_wins'].tolist(),
                         standings_data['race_stage_points'].tolist(),
                         standings_data['race_finish_points'].tolist(),
-                        standings_data['race_season_points'].tolist(),
+                        standings_data['season_points'].tolist(),
                         standings_data['pos'].tolist(),
                )
     }
     return results
 
-def compose_playoff_standings_data(raw_standings_data: dict) -> dict:
-    standings_data = pd.DataFrame({'driver_name': [res['driver_name'] for res in raw_standings_data],
-                                  'wins': [res['wins'] for res in raw_standings_data],
-                                  'stage_wins': [res['stage_wins'] for res in raw_standings_data],
-                                  'race_playoff_points': [res['race_playoff_points'] for res in raw_standings_data],
-                                  'race_season_points': [res['race_season_points'] for res in raw_standings_data]})
-    standings_data = standings_data.groupby('driver_name', as_index=False).sum()
-    standings_data = standings_data.sort_values(by=['wins', 'race_season_points'], ascending=False).reset_index(drop=True)
-    standings_data['pos'] = [x for x in range(1, len(standings_data) + 1)]
+def compose_playoff_standings_data(raw_data: dict, current_round: str, current_season: str) -> dict:
+    current_race = int(current_round)
+    raw_standings_data = pd.DataFrame({'driver_name': [res['driver_name'] for res in raw_data],
+                                  'wins': [res['wins'] for res in raw_data],
+                                  'stage_wins': [res['stage_wins'] for res in raw_data],
+                                  'race_stage_points': [res['race_stage_points'] for res in raw_data],
+                                  'race_finish_points': [res['race_finish_points'] for res in raw_data],
+                                  'race_season_points': [res['race_season_points'] for res in raw_data],
+                                  'initial_season_points': [res['race_season_points'] for res in raw_data],
+                                  'race_number': [res['race_number'] for res in raw_data]})
+    
+    data = standings_calculation(raw_standings_data, current_race, int(current_season))
 
-    standings_data['point_gap_to_leader'] = standings_data['race_season_points'] - \
-        standings_data[standings_data['race_season_points'] == standings_data['race_season_points'].max()]['race_season_points'].tolist()[0]
+    if current_race <= 26:
+        standings_data = compose_bubble(data, 16, 'season_wins')
+    elif current_race <= 29:
+        standings_data = compose_bubble(data, 12, 'playoff_16_wins')
+    elif current_race <= 32:
+        standings_data = compose_bubble(data, 8, 'playoff_12_wins')
+    elif current_race <= 35:
+        standings_data = compose_bubble(data, 4, 'playoff_8_wins')
+    elif current_race == 36:
+        standings_data = data.sort_values(by=['champion', 'season_points'], ascending=False).reset_index(drop=True)
+        standings_data['pos'] = [x for x in range(1, len(standings_data) + 1)]
+        standings_data['point_gap_to_leader'] = standings_data['season_points'] - \
+            standings_data[standings_data['season_points'] == standings_data['season_points'].max()]['season_points'].tolist()[0]
+        standings_data['point_gap_to_leader'] = standings_data['point_gap_to_leader'].fillna(0).astype(int).astype(str)
 
-    standings_data['point_gap_to_leader'] = standings_data['point_gap_to_leader'].fillna(0).astype(int).astype(str)
-    standings_data.loc[standings_data['race_season_points'] == standings_data['race_season_points'].max(), 'point_gap_to_leader'] = 'Season leader'
-    standings_data.loc[standings_data['pos'] <= 16, 'point_gap_to_bubble'] = standings_data['race_season_points'] - standings_data[standings_data['pos'] == 17]['race_season_points'].tolist()[0]
-    standings_data.loc[standings_data['pos'] > 16, 'point_gap_to_bubble'] = standings_data['race_season_points'] - standings_data[standings_data['pos'] == 16]['race_season_points'].tolist()[0]
-    standings_data['point_gap_to_bubble'] = standings_data['point_gap_to_bubble'].astype(int)
-    standings_data.loc[standings_data['point_gap_to_bubble'] > 0, 'point_gap_to_bubble'] = '+' + standings_data[standings_data['point_gap_to_bubble'] > 0].astype(str)
-    standings_data.loc[standings_data['wins'] > 0, 'point_gap_to_bubble'] = 'Locked In'
 
     results = {}
     results['Playoff_standings'] = {
@@ -263,23 +275,50 @@ def compose_playoff_standings_data(raw_standings_data: dict) -> dict:
             'race_season_points': race_season_points,
             'point_gap_to_leader': point_gap_to_leader,
             'point_gap_to_bubble': point_gap_to_bubble,
-            'race_playoff_points': race_playoff_points,
+            'race_playoff_points': playoff_points,
             } for (drivers,
                wins,
                stage_wins,
                race_season_points,
                point_gap_to_leader,
                point_gap_to_bubble,
-               race_playoff_points,
+               playoff_points,
                pos) in zip(
                         standings_data['driver_name'].tolist(),
                         standings_data['wins'].tolist(),
                         standings_data['stage_wins'].tolist(),
-                        standings_data['race_season_points'].tolist(),
+                        standings_data['season_points'].tolist(),
                         standings_data['point_gap_to_leader'].tolist(),
                         standings_data['point_gap_to_bubble'].tolist(),
-                        standings_data['race_playoff_points'].tolist(),
+                        standings_data['playoff_points'].tolist(),
                         standings_data['pos'].tolist(),
                )
     }
     return results
+
+def compose_bubble(data: pd.DataFrame, playoff_drivers: int, wins_column: str) -> pd.DataFrame:
+    standings_data = data.sort_values(by=[wins_column, 'season_points'], ascending=False).reset_index(drop=True)
+    standings_data['pos'] = [x for x in range(1, len(standings_data) + 1)]
+
+    standings_data['point_gap_to_leader'] = standings_data['season_points'] - \
+        standings_data[standings_data['season_points'] == standings_data['season_points'].max()]['season_points'].tolist()[0]
+
+    standings_data['point_gap_to_leader'] = standings_data['point_gap_to_leader'].fillna(0).astype(int).astype(str)
+    standings_data.loc[
+        standings_data['season_points'] == standings_data['season_points'].max(),
+        'point_gap_to_leader'] = 'Points Leader'
+
+    standings_data.loc[
+        standings_data['pos'] <= playoff_drivers,
+        'point_gap_to_bubble'] = standings_data['season_points'] - \
+            standings_data[standings_data['pos'] == playoff_drivers + 1]['season_points'].tolist()[0]
+    standings_data.loc[
+        standings_data['pos'] > playoff_drivers,
+        'point_gap_to_bubble'] = standings_data['season_points'] - \
+            standings_data[standings_data['pos'] == playoff_drivers]['season_points'].tolist()[0]
+    standings_data['point_gap_to_bubble'] = standings_data['point_gap_to_bubble'].astype(int)
+    standings_data.loc[
+        standings_data['point_gap_to_bubble'] > 0,
+        'point_gap_to_bubble'] = '+' + standings_data[standings_data['point_gap_to_bubble'] > 0].astype(str)
+    standings_data.loc[standings_data[wins_column] > 0, 'point_gap_to_bubble'] = 'Locked In'
+    return standings_data

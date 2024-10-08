@@ -14,9 +14,8 @@ available_races = writer.get_available_races()
 
 writer.fill_calendar_info()
 
-season = 2024
-for season in (2023, 2024):
-    for race_number in range(1, 40):
+for season in [2024]:
+    for race_number in range(1, 37):
         if (season, race_number) not in available_races:
             print(season, race_number)
             is_success = scrap_race(season, race_number)

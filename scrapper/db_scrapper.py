@@ -28,9 +28,6 @@ def scrap_race(season: int, race_number: int) -> bool:
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 
     driver = webdriver.Chrome(options=options)
-    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    
 
     try:
         driver.get(url)
@@ -117,8 +114,10 @@ def scrap_race(season: int, race_number: int) -> bool:
         try:
             top_10_stage1 = soup.find('b', string='Top 10 in Stage 1:')
             top_10_stage2 = soup.find('b', string='Top 10 in Stage 2:')
+            top_10_stage3 = soup.find('b', string='Top 10 in Stage 3:')
             stage1_info = []
             stage2_info = []
+            stage3_info = []
 
             if top_10_stage1:
                 stage1_info = top_10_stage1.next_sibling.strip().split(', ')
@@ -130,14 +129,20 @@ def scrap_race(season: int, race_number: int) -> bool:
             else:
                 logging.warning("Top 10 in Stage 2 not found")
 
+            if top_10_stage3:
+                stage3_info = top_10_stage3.next_sibling.strip().split(', ')
+            else:
+                logging.warning("Top 10 in Stage 3 not found")
+
             top10_file_path = os.path.join(folder_name, 'top_10s.csv')
             with open(top10_file_path, 'w', newline='', encoding='utf-8') as csvfile:
                 csv_writer = csv.writer(csvfile)
-                csv_writer.writerow(['Top 10 in Stage 1:', 'Top 10 in Stage 2:'])
+                csv_writer.writerow(['Top 10 in Stage 1:', 'Top 10 in Stage 2:', 'Top 10 in Stage 3:'])
                 for i in range(max(len(stage1_info), len(stage2_info))):
                     row = [
                         stage1_info[i] if i < len(stage1_info) else '',
-                        stage2_info[i] if i < len(stage2_info) else ''
+                        stage2_info[i] if i < len(stage2_info) else '',
+                        stage3_info[i] if i < len(stage3_info) else ''
                     ]
                     csv_writer.writerow(row)
         except Exception as e:
