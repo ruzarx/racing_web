@@ -99,7 +99,7 @@ class NascarResultsParser:
         stage_points = [int(pts) for pts in (results_data['stage_1_pts'].values + \
                                              results_data['stage_2_pts'].values + \
                                              results_data['stage_3_pts'].values)]
-        season_points = [finish + stage for finish, stage in zip(finish_position_points, stage_points)]
+        season_points = [int(points) for points in results_data['Pts'].values]
         wins = [1 if pos == 1 else 0 for pos in race_pos]
         stage_wins = [(pos_stage_1 == 1) + \
                       (pos_stage_2 == 1) + \

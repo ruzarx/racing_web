@@ -129,6 +129,7 @@ def standings_calculation(raw_data: pd.DataFrame, current_race: int, season: int
                                                                      playoff_16_wins,
                                                                      playoff_12_wins,
                                                                      playoff_8_wins)
+        print(race, season_points['Tyler Reddick'])
     data = raw_data[
         ['driver_name', 'stage_wins', 'race_stage_points', 'race_finish_points']
         ].groupby('driver_name', as_index=False).sum()

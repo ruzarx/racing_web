@@ -9,6 +9,9 @@ import inflect
 
 from scrapper.db_connectors import DBReader
 
+import warnings
+warnings.filterwarnings('ignore')
+
 
 app = Flask(__name__)
 app.jinja_env.filters['ordinal_suffix'] = inflect.engine().ordinal
@@ -85,4 +88,4 @@ def wec():
 
 
 if __name__ == '__main__':
-    app.run(port=5001, host='0.0.0.0')
+    app.run(debug=True, port=5001, host='0.0.0.0')
