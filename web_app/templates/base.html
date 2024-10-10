@@ -32,62 +32,88 @@
         <p>&copy; 2024 Racing Analytics</p>
     </footer>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            setupMainTabs();
-            setupSessionTabs();
-        });
-
         function setupMainTabs() {
             const mainTabs = document.querySelectorAll('.main-tab-link');
             const mainTabContent = document.querySelectorAll('.tab');
-            
+
             mainTabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabId = tab.dataset.tab;
-                    mainTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    mainTabContent.forEach(tc => tc.classList.remove('active'));
-                    document.getElementById(tabId).classList.add('active');
 
-                    // Automatically trigger the "Race" subtab when "Race Results" tab is clicked
-                    if (tabId === 'race-results') {
-                        const raceSessionTab = document.querySelector('.session-tab-link[data-tab="Race"]');
-                        if (raceSessionTab) {
-                            raceSessionTab.click();
-                        }
-                    }
+                    // Remove 'active' class from all main tabs and content
+                    mainTabs.forEach(t => t.classList.remove('active'));
+                    mainTabContent.forEach(tc => tc.classList.remove('active'));
+
+                    // Activate the clicked tab and corresponding content
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
                 });
             });
 
-            const selectedRace = new URLSearchParams(window.location.search).get('race');
-            if (selectedRace) {
-                const raceResultsTab = document.querySelector('.main-tab-link[data-tab="race-results"]');
-                if (raceResultsTab) {
-                    raceResultsTab.click();
-                    setTimeout(() => {
-                        const raceSessionTab = document.querySelector('.session-tab-link[data-tab="Race"]');
-                        if (raceSessionTab) {
-                            raceSessionTab.click();
-                        }
-                    }, 100); // Adjust the delay if needed
-                }
-            } else {
+            // Default to the first main tab (Race Results)
+            if (mainTabs.length > 0) {
                 mainTabs[0].click();
             }
         }
 
-        function setupSessionTabs() {
-            document.addEventListener('click', (event) => {
-                if (event.target.classList.contains('session-tab-link')) {
-                    const tabId = event.target.dataset.tab;
-                    document.querySelectorAll('.session-tab-link').forEach(t => t.classList.remove('active'));
-                    event.target.classList.add('active');
-                    document.querySelectorAll('.session-tab').forEach(tc => tc.classList.remove('active'));
-                    document.getElementById(tabId).classList.add('active');
+        function setupInnerTabs() {
+            // Set up inner tabs (Race Results section tabs like Race Results, Race Details, etc.)
+            document.querySelectorAll('.inner-tabs').forEach(tabContainer => {
+                const tabs = tabContainer.querySelectorAll('.inner-tab-link');
+                const tabContent = tabContainer.parentElement.querySelectorAll('.inner-tab');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.dataset.tab;
+
+                        // Remove 'active' class from all inner tabs and content
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tabContent.forEach(tc => tc.classList.remove('active'));
+
+                        // Activate the clicked inner tab and corresponding content
+                        tab.classList.add('active');
+                        document.getElementById(tabId).classList.add('active');
+                    });
+                });
+
+                // Default to the first inner tab
+                if (tabs.length > 0) {
+                    tabs[0].click();
+                }
+            });
+
+            // Set up session tabs (Race, Qualifying, Stage 1, Stage 2) under Race Results
+            document.querySelectorAll('.session-tabs').forEach(sessionTabContainer => {
+                const sessionTabs = sessionTabContainer.querySelectorAll('.session-tab-link');
+                const sessionTabContent = sessionTabContainer.parentElement.querySelectorAll('.session-tab');
+
+                sessionTabs.forEach(sessionTab => {
+                    sessionTab.addEventListener('click', () => {
+                        const sessionTabId = sessionTab.dataset.tab;
+
+                        // Remove 'active' class from all session tabs and content
+                        sessionTabs.forEach(st => st.classList.remove('active'));
+                        sessionTabContent.forEach(stc => stc.classList.remove('active'));
+
+                        // Activate the clicked session tab and corresponding content
+                        sessionTab.classList.add('active');
+                        document.getElementById(sessionTabId).classList.add('active');
+                    });
+                });
+
+                // Default to the first session tab
+                if (sessionTabs.length > 0) {
+                    sessionTabs[0].click();
                 }
             });
         }
-        </script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupMainTabs();  // Sets up Race Results and Analysis tabs
+            setupInnerTabs();  // Sets up inner tabs (Race Results, Race Details, etc.) and session tabs
+        });
+
+    </script>
         
 </body>
 </html>

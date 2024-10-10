@@ -266,3 +266,37 @@ tbody tr.champion {
 .session-tab-link:hover {
     background-color: #e0e0e0;
 }
+
+
+.main-tabs, .inner-tabs {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.main-tab-link, .inner-tab-link {
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    margin-right: 5px;
+    text-align: center;
+}
+
+.main-tab-link.active, .inner-tab-link.active {
+    background-color: #0056b3;
+}
+
+.tab, .inner-tab {
+    display: none;
+}
+
+.tab.active, .inner-tab.active {
+    display: block;
+}
+
+.tab-content, .inner-tab-content {
+    margin-top: 20px;
+}

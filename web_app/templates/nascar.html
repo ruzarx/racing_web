@@ -50,294 +50,315 @@
         {% elif selected_race_data.season_stage == "playoff_4" %}
         <h5>{{ selected_race_data.race_name }} - {{ selected_race_data.track_type }} - Championship Final</h5>
         {% endif %}
-        <ul class="main-tabs"> 
+
+        <ul class="main-tabs">
             <li class="main-tab-link" data-tab="race-results">Race Results</li>
-            <li class="main-tab-link" data-tab="race-details">Race Details</li>
-            <li class="main-tab-link" data-tab="season-standings">Season Standings</li>
-            <li class="main-tab-link" data-tab="playoff-standings">Playoff Standings</li>
+            <li class="main-tab-link" data-tab="analysis">Analysis</li>
         </ul>
-
+    
         <div class="tab-content">
-            <div id="race-results" class="tab">
-                <ul class="session-tabs">
-                    <li class="session-tab-link" data-tab="Race">Race</li>
-                    <li class="session-tab-link" data-tab="Qualifying">Qualifying</li>
-                    <li class="session-tab-link" data-tab="Stage 1">Stage 1</li>
-                    <li class="session-tab-link" data-tab="Stage 2">Stage 2</li>
+            <!-- Race Results Section (default active) -->
+            <div id="race-results" class="tab active">
+                <ul class="inner-tabs">
+                    <li class="inner-tab-link" data-tab="race-results-content">Race Results</li>
+                    <li class="inner-tab-link" data-tab="race-details-content">Race Details</li>
+                    <li class="inner-tab-link" data-tab="season-standings-content">Season Standings</li>
+                    <li class="inner-tab-link" data-tab="playoff-standings-content">Playoff Standings</li>
                 </ul>
-
-                <div class="session-tab-content">
-                    {% if selected_race %}
-                        {% if selected_race_data.results and selected_race_data.results|length > 0 %}
-                            <div id="Race" class="session-tab {% if active_tab == 'Race' %}active{% endif %}">
-                                <h4>Race Results</h4>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Position</th>
-                                            <th>Driver</th>
-                                            <th>Car Number</th>
-                                            <th>Team</th>
-                                            <th>Make</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for driver, rest_data in selected_race_data.results.Race.items() %}
-                                            <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
-                                                <td>{{ rest_data.position }}</td>
-                                                <td>{{ driver }}</td>
-                                                <td>{{ rest_data.car_number }}</td>
-                                                <td>{{ rest_data.team }}</td>
-                                                <td>{{ rest_data.make }}</td>
+                <div class="inner-tab-content">
+                    <div id="race-results-content" class="inner-tab active">
+                        <ul class="session-tabs">
+                            <li class="session-tab-link" data-tab="Race">Race</li>
+                            <li class="session-tab-link" data-tab="Qualifying">Qualifying</li>
+                            <li class="session-tab-link" data-tab="Stage 1">Stage 1</li>
+                            <li class="session-tab-link" data-tab="Stage 2">Stage 2</li>
+                        </ul>
+        
+                        <div class="session-tab-content">
+                            {% if selected_race %}
+                                {% if selected_race_data.results and selected_race_data.results|length > 0 %}
+                                    <div id="Race" class="session-tab active">
+                                        <h4>Race Results</h4>
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Position</th>
+                                                    <th>Driver</th>
+                                                    <th>Car Number</th>
+                                                    <th>Team</th>
+                                                    <th>Make</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for driver, rest_data in selected_race_data.results.Race.items() %}
+                                                    <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
+                                                        <td>{{ rest_data.position }}</td>
+                                                        <td>{{ driver }}</td>
+                                                        <td>{{ rest_data.car_number }}</td>
+                                                        <td>{{ rest_data.team }}</td>
+                                                        <td>{{ rest_data.make }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <p>This race has not yet occurred. Results will be available once the race is completed.</p>
+                                {% endif %}
+                            
+                                <div id="Qualifying" class="session-tab">
+                                    <h4>Qualifying Results</h4>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Position</th>
+                                                <th>Driver</th>
+                                                <th>Car Number</th>
+                                                <th>Team</th>
+                                                <th>Make</th>
                                             </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p>This race has not yet occurred. Results will be available once the race is completed.</p>
-                        {% endif %}
-                    
-                        <div id="Qualifying" class="session-tab {% if active_tab == 'Qualifying' %}active{% endif %}">
-                            <h4>Qualifying Results</h4>
+                                        </thead>
+                                        <tbody>
+                                            {% for driver, rest_data in selected_race_data.results.Qualifying.items() %}
+                                                <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
+                                                    <td>{{ rest_data.position }}</td>
+                                                    <td>{{ driver }}</td>
+                                                    <td>{{ rest_data.car_number }}</td>
+                                                    <td>{{ rest_data.team }}</td>
+                                                    <td>{{ rest_data.make }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            
+                                <div id="Stage 1" class="session-tab">
+                                    <h4>Stage 1 Results</h4>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Position</th>
+                                                <th>Driver</th>
+                                                <th>Car Number</th>
+                                                <th>Team</th>
+                                                <th>Make</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for driver, rest_data in selected_race_data.results['Stage 1'].items() %}
+                                                <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
+                                                    <td>{{ rest_data.position }}</td>
+                                                    <td>{{ driver }}</td>
+                                                    <td>{{ rest_data.car_number }}</td>
+                                                    <td>{{ rest_data.team }}</td>
+                                                    <td>{{ rest_data.make }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                        
+                                <div id="Stage 2" class="session-tab">
+                                    <h4>Stage 2 Results</h4>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Position</th>
+                                                <th>Driver</th>
+                                                <th>Car Number</th>
+                                                <th>Team</th>
+                                                <th>Make</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for driver, rest_data in selected_race_data.results['Stage 2'].items() %}
+                                                <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
+                                                    <td>{{ rest_data.position }}</td>
+                                                    <td>{{ driver }}</td>
+                                                    <td>{{ rest_data.car_number }}</td>
+                                                    <td>{{ rest_data.team }}</td>
+                                                    <td>{{ rest_data.make }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p>Please select a race to view results.</p>
+                            {% endif %}
+                        </div>    
+                    </div>
+                    <div id="race-details-content" class="inner-tab">
+                        {% if selected_race %}
+                        {% for data_type, results in selected_race_details.items() %}
                             <table>
                                 <thead>
                                     <tr>
                                         <th>Position</th>
                                         <th>Driver</th>
-                                        <th>Car Number</th>
-                                        <th>Team</th>
-                                        <th>Make</th>
+                                        <th>Laps Led</th>
+                                        <th>Status</th>
+                                        <th>Finish Position Points</th>
+                                        <th>Stage Points</th>
+                                        <th>Season Points</th>
+                                        <th>Playoff Points</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for driver, rest_data in selected_race_data.results.Qualifying.items() %}
-                                        <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
+                                    {% for driver, rest_data in results.items() %}
+                                        <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %} class="top-ten"{% endif %}>
                                             <td>{{ rest_data.position }}</td>
                                             <td>{{ driver }}</td>
-                                            <td>{{ rest_data.car_number }}</td>
-                                            <td>{{ rest_data.team }}</td>
-                                            <td>{{ rest_data.make }}</td>
+                                            <td>{{ rest_data.laps_led }}</td>
+                                            <td>{{ rest_data.status }}</td>
+                                            <td>{{ rest_data.finish_position_points }}</td>
+                                            <td>{{ rest_data.stage_points }}</td>
+                                            <td>{% if rest_data.season_points > 0 %}{{ rest_data.season_points }}{% else %}-{% endif %}</td>
+                                            <td>{% if rest_data.season_points > 0 %}{{ rest_data.playoff_points }}{% else %}-{% endif %}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
-                        </div>
-                    
-                        <div id="Stage 1" class="session-tab {% if active_tab == 'Stage 1' %}active{% endif %}">
-                            <h4>Stage 1 Results</h4>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Position</th>
-                                        <th>Driver</th>
-                                        <th>Car Number</th>
-                                        <th>Team</th>
-                                        <th>Make</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for driver, rest_data in selected_race_data.results['Stage 1'].items() %}
-                                        <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
-                                            <td>{{ rest_data.position }}</td>
-                                            <td>{{ driver }}</td>
-                                            <td>{{ rest_data.car_number }}</td>
-                                            <td>{{ rest_data.team }}</td>
-                                            <td>{{ rest_data.make }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                
-                        <div id="Stage 2" class="session-tab {% if active_tab == 'Stage 2' %}active{% endif %}">
-                            <h4>Stage 2 Results</h4>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Position</th>
-                                        <th>Driver</th>
-                                        <th>Car Number</th>
-                                        <th>Team</th>
-                                        <th>Make</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for driver, rest_data in selected_race_data.results['Stage 2'].items() %}
-                                        <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %}class="top-ten"{% endif %}>
-                                            <td>{{ rest_data.position }}</td>
-                                            <td>{{ driver }}</td>
-                                            <td>{{ rest_data.car_number }}</td>
-                                            <td>{{ rest_data.team }}</td>
-                                            <td>{{ rest_data.make }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <p>Please select a race to view results.</p>
+                        {% endfor %}
                     {% endif %}
-                </div>                        
-                
+                    </div>
+                    <div id="season-standings-content" class="inner-tab">
+                        {% if selected_race %}
+                        {% for data_type, results in season_standings.items() %}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Driver</th>
+                                        <th># Wins</th>
+                                        <th># Stage Wins</th>
+                                        <th>Finish Position Points</th>
+                                        <th>Stage Points</th>
+                                        <th>Season Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for driver, rest_data in results.items() %}
+                                        <tr 
+                                            {% if rest_data.position == 1 %}class="winner"{% endif %}
+                                            {% if selected_race|int <= 26 %}
+                                                {% if rest_data.position <= 10 %}
+                                                    class="top-ten"
+                                                {% endif %}
+                                            {% elif 27 <= selected_race|int <= 29 %}
+                                                {% if rest_data.position <= 16 %}
+                                                    class="top-ten"
+                                                {% endif %}
+                                            {% elif 30 <= selected_race|int <= 32 %}
+                                                {% if rest_data.position <= 12 %}
+                                                    class="top-ten"
+                                                {% endif %}
+                                            {% elif 33 <= selected_race|int <= 35 %}
+                                                {% if rest_data.position <= 8 %}
+                                                    class="top-ten"
+                                                {% endif %}
+                                            {% elif selected_race|int == 36 %}
+                                                {% if rest_data.position == 1 %}
+                                                    class="top-ten"
+                                                {% endif %}
+                                            {% endif %}
+                                        >
+                                            <td>{{ rest_data.position }}</td>
+                                            <td>{{ driver }}</td>
+                                            <td>{{ rest_data.wins }}</td>
+                                            <td>{{ rest_data.stage_wins }}</td>
+                                            <td>{{ rest_data.race_finish_points }}</td>
+                                            <td>{% if rest_data.race_stage_points > 0 %}{{ rest_data.race_stage_points }}{% else %}0{% endif %}</td>
+                                            <td>{% if rest_data.race_season_points > 0 %}{{ rest_data.race_season_points }}{% else %}0{% endif %}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>                        
+                            </table>
+                        {% endfor %}
+                    {% endif %}
+                    </div>
+                    <div id="playoff-standings-content" class="inner-tab">
+                        {% if selected_race %}
+                        {% for data_type, results in playoff_standings.items() %}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Driver</th>
+                                        <th># Wins</th>
+                                        <th># Stage Wins</th>
+                                        <th>Season Points</th>
+                                        <th>Gap To Leader</th>
+                                        <th>Gap To Bubble</th>
+                                        <th>Playoff Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for driver, rest_data in results.items() %}
+                                        <tr
+                                            {% if rest_data.position == 1 %}class="winner"{% endif %}
+                                            {% if selected_race|int <= 26 %}
+                                                {% if 16 < rest_data.position <= 20 %}
+                                                class="playoff-contender"
+                                            {% elif rest_data.position <= 16 %}
+                                                class="top-ten"
+                                            {% endif %}
+                                            {% elif 27 <= selected_race|int <= 29 %}
+                                                {% if 12 < rest_data.position <= 16 %}
+                                                    class="playoff-contender"
+                                                {% elif rest_data.position <= 12 %}
+                                                    class="top-ten"
+                                                {% endif %}
+                                            {% elif 30 <= selected_race|int <= 32 %}
+                                                {% if 8 < rest_data.position <= 12 %}
+                                                    class="playoff-contender"
+                                                {% elif rest_data.position <= 8 %}
+                                                    class="top-ten"
+                                                {% endif %}
+                                            {% elif 33 <= selected_race|int <= 35 %}
+                                                {% if 4 < rest_data.position <= 8 %}
+                                                    class="playoff-contender"
+                                                {% elif rest_data.position <= 4 %}
+                                                    class="top-ten"
+                                                {% endif %}
+                                            {% elif selected_race|int == 36 %}
+                                                {% if rest_data.position == 1 %}
+                                                    class="champion"
+                                                {% endif %}
+                                            {% endif %}
+                                        >
+                                            <td>{{ rest_data.position }}</td>
+                                            <td>{{ driver }}</td>
+                                            <td>{{ rest_data.wins }}</td>
+                                            <td>{{ rest_data.stage_wins }}</td>
+                                            <td>{{ rest_data.race_season_points }}</td>
+                                            <td>{{ rest_data.point_gap_to_leader }}</td>
+                                            <td>{{ rest_data.point_gap_to_bubble }}</td>
+                                            <td>{{ rest_data.race_playoff_points }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>                                          
+                            </table>
+                        {% endfor %}
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div id="analysis" class="tab">
+                <ul class="inner-tabs">
+                    <li class="inner-tab-link" data-tab="driver-stats-content">Driver Stats</li>
+                    <li class="inner-tab-link" data-tab="track-stats-content">Track Stats</li>
+                </ul>
+                <div class="inner-tab-content">
+                    <div id="driver-stats-content" class="inner-tab active">
+                        <!-- Driver Stats content goes here -->
+                    </div>
+                    <div id="track-stats-content" class="inner-tab">
+                        <!-- Track Stats content goes here -->
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="race-details" class="tab">
-            {% if selected_race %}
-                {% for data_type, results in selected_race_details.items() %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Position</th>
-                                <th>Driver</th>
-                                <th>Laps Led</th>
-                                <th>Status</th>
-                                <th>Finish Position Points</th>
-                                <th>Stage Points</th>
-                                <th>Season Points</th>
-                                <th>Playoff Points</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for driver, rest_data in results.items() %}
-                                <tr {% if rest_data.position == 1 %}class="winner"{% elif 2 <= rest_data.position <= 10 %} class="top-ten"{% endif %}>
-                                    <td>{{ rest_data.position }}</td>
-                                    <td>{{ driver }}</td>
-                                    <td>{{ rest_data.laps_led }}</td>
-                                    <td>{{ rest_data.status }}</td>
-                                    <td>{{ rest_data.finish_position_points }}</td>
-                                    <td>{{ rest_data.stage_points }}</td>
-                                    <td>{% if rest_data.season_points > 0 %}{{ rest_data.season_points }}{% else %}-{% endif %}</td>
-                                    <td>{% if rest_data.season_points > 0 %}{{ rest_data.playoff_points }}{% else %}-{% endif %}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <div id="season-standings" class="tab">
-            {% if selected_race %}
-                {% for data_type, results in season_standings.items() %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Position</th>
-                                <th>Driver</th>
-                                <th># Wins</th>
-                                <th># Stage Wins</th>
-                                <th>Finish Position Points</th>
-                                <th>Stage Points</th>
-                                <th>Season Points</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for driver, rest_data in results.items() %}
-                                <tr 
-                                    {% if rest_data.position == 1 %}class="winner"{% endif %}
-                                    {% if selected_race|int <= 26 %}
-                                        {% if rest_data.position <= 10 %}
-                                            class="top-ten"
-                                        {% endif %}
-                                    {% elif 27 <= selected_race|int <= 29 %}
-                                        {% if rest_data.position <= 16 %}
-                                            class="top-ten"
-                                        {% endif %}
-                                    {% elif 30 <= selected_race|int <= 32 %}
-                                        {% if rest_data.position <= 12 %}
-                                            class="top-ten"
-                                        {% endif %}
-                                    {% elif 33 <= selected_race|int <= 35 %}
-                                        {% if rest_data.position <= 8 %}
-                                            class="top-ten"
-                                        {% endif %}
-                                    {% elif selected_race|int == 36 %}
-                                        {% if rest_data.position == 1 %}
-                                            class="top-ten"
-                                        {% endif %}
-                                    {% endif %}
-                                >
-                                    <td>{{ rest_data.position }}</td>
-                                    <td>{{ driver }}</td>
-                                    <td>{{ rest_data.wins }}</td>
-                                    <td>{{ rest_data.stage_wins }}</td>
-                                    <td>{{ rest_data.race_finish_points }}</td>
-                                    <td>{% if rest_data.race_stage_points > 0 %}{{ rest_data.race_stage_points }}{% else %}0{% endif %}</td>
-                                    <td>{% if rest_data.race_season_points > 0 %}{{ rest_data.race_season_points }}{% else %}0{% endif %}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>                        
-                    </table>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <div id="playoff-standings" class="tab">
-            {% if selected_race %}
-                {% for data_type, results in playoff_standings.items() %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Position</th>
-                                <th>Driver</th>
-                                <th># Wins</th>
-                                <th># Stage Wins</th>
-                                <th>Season Points</th>
-                                <th>Gap To Leader</th>
-                                <th>Gap To Bubble</th>
-                                <th>Playoff Points</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for driver, rest_data in results.items() %}
-                                <tr
-                                    {% if rest_data.position == 1 %}class="winner"{% endif %}
-                                    {% if selected_race|int <= 26 %}
-                                        {% if 16 < rest_data.position <= 20 %}
-                                        class="playoff-contender"
-                                    {% elif rest_data.position <= 16 %}
-                                        class="top-ten"
-                                    {% endif %}
-                                    {% elif 27 <= selected_race|int <= 29 %}
-                                        {% if 12 < rest_data.position <= 16 %}
-                                            class="playoff-contender"
-                                        {% elif rest_data.position <= 12 %}
-                                            class="top-ten"
-                                        {% endif %}
-                                    {% elif 30 <= selected_race|int <= 32 %}
-                                        {% if 8 < rest_data.position <= 12 %}
-                                            class="playoff-contender"
-                                        {% elif rest_data.position <= 8 %}
-                                            class="top-ten"
-                                        {% endif %}
-                                    {% elif 33 <= selected_race|int <= 35 %}
-                                        {% if 4 < rest_data.position <= 8 %}
-                                            class="playoff-contender"
-                                        {% elif rest_data.position <= 4 %}
-                                            class="top-ten"
-                                        {% endif %}
-                                    {% elif selected_race|int == 36 %}
-                                        {% if rest_data.position == 1 %}
-                                            class="champion"
-                                        {% endif %}
-                                    {% endif %}
-                                >
-                                    <td>{{ rest_data.position }}</td>
-                                    <td>{{ driver }}</td>
-                                    <td>{{ rest_data.wins }}</td>
-                                    <td>{{ rest_data.stage_wins }}</td>
-                                    <td>{{ rest_data.race_season_points }}</td>
-                                    <td>{{ rest_data.point_gap_to_leader }}</td>
-                                    <td>{{ rest_data.point_gap_to_bubble }}</td>
-                                    <td>{{ rest_data.race_playoff_points }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>                                          
-                    </table>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </div>
     {% else %}
         <p>The race results are not ready yet</p>
     {% endif %}
