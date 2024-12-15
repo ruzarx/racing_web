@@ -229,7 +229,6 @@ class DBReader:
         self.app = app
         self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@postgres:5432/racing_db'
         # self.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/racing_data'
-        
         self.db = SQLAlchemy(app)
         return
     
