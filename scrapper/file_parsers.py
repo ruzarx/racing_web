@@ -142,7 +142,10 @@ class NascarResultsParser:
         return race_results, standings
     
     def _fix_team_names(self, team_names: str) -> str:
-        return owners_to_teams[team_names.split('(')[-1].strip(')')]
+        team_name = team_names.split('(')[-1].strip(')')
+        if team_name in owners_to_teams:
+            return owners_to_teams[team_name]
+        return 'unknown'
 
     def _load_stage_data(self):
         stage_data = pd.read_csv(f'data/{self.season}/{self.race_number}/top_10s.csv')
