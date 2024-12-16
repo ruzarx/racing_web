@@ -8,6 +8,10 @@ services:
     restart: always
     depends_on:
       - postgres
+    networks:
+      default:
+        driver: bridge
+
 
   webapp:
     build:
@@ -18,7 +22,11 @@ services:
     ports:
       - "8080:5001"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    networks:
+      default:
+        driver: bridge
 
   postgres:
     image: postgres:latest
@@ -30,3 +38,12 @@ services:
       - "5432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      default:
+        driver: bridge
+    
