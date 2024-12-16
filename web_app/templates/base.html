@@ -3,6 +3,7 @@
 <head>
     <title>{% block title %}{% endblock %} - Racing Analytics</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
@@ -31,6 +32,10 @@
     <footer>
         <p>&copy; 2024 Racing Analytics</p>
     </footer>
+    <script>
+        var drivers = {{ drivers|tojson|safe }};
+        var driverRaceData = {{ driver_race_data|safe }};
+    </script>
     <script>
         function setupMainTabs() {
             const mainTabs = document.querySelectorAll('.main-tab-link');
@@ -108,9 +113,136 @@
             });
         }
 
+        function setupDriverStats() {
+  const driverSelection = document.getElementById('driver-selection');
+  const plotButton = document.getElementById('plot-button');
+  const plotArea = document.getElementById('driver-plot');
+
+  if (typeof drivers !== 'undefined') {
+    drivers.forEach((driver, index) => {
+      const checkboxItem = document.createElement('div');
+      checkboxItem.className = 'checkbox-item';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = `driver-${index}`;
+      checkbox.value = driver;
+
+      const label = document.createElement('label');
+      label.htmlFor = `driver-${index}`;
+      label.textContent = driver;
+
+      checkboxItem.appendChild(checkbox);
+      checkboxItem.appendChild(label);
+      driverSelection.appendChild(checkboxItem);
+    });
+  }
+
+  plotButton.addEventListener('click', () => {
+    const selectedDrivers = Array.from(driverSelection.querySelectorAll('input:checked')).map(cb => cb.value);
+    const selectedStat = document.getElementById('stats-selector').value;
+    if (selectedDrivers.length > 0) {
+      plotDriverStats(selectedDrivers, selectedStat);
+    } else {
+      alert('Please select at least one driver.');
+    }
+  });
+}
+
+function plotDriverStats(selectedDrivers, selectedStat) {
+  const plotArea = document.getElementById('driver-plot');
+  plotArea.innerHTML = '<canvas id="driverStatsChart"></canvas>';
+
+  const raceNumbers = [...new Set(Object.values(driverRaceData).flatMap(data => data.map(d => d.race_number)))].sort((a, b) => a - b);
+
+  const datasets = selectedDrivers.map((driver, index) => {
+    const driverData = driverRaceData[driver];
+    return {
+      label: driver,
+      data: raceNumbers.map(raceNumber => {
+        const raceData = driverData.find(d => d.race_number === raceNumber);
+        return raceData ? raceData[selectedStat] : null;
+      }),
+      borderColor: getColor(index),
+      fill: false
+    };
+  });
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    title: {
+      display: true,
+      text: `Driver ${getStatLabel(selectedStat)} Comparison`
+    },
+    tooltips: {
+      mode: 'index',
+      intersect: false,
+    },
+    hover: {
+      mode: 'nearest',
+      intersect: true
+    },
+    scales: {
+      x: {
+        display: true,
+        scaleLabel: {
+          display: true,
+          labelString: 'Race'
+        }
+      },
+      y: {
+        display: true,
+        scaleLabel: {
+          display: true,
+          labelString: getStatLabel(selectedStat)
+        }
+      }
+    }
+  };
+
+  if (selectedStat === 'season_standings') {
+    chartOptions.scales.y.reverse = true;
+  }
+
+  new Chart('driverStatsChart', {
+    type: 'line',
+    data: {
+      labels: raceNumbers.map(num => `Race ${num}`),
+      datasets: datasets
+    },
+    options: chartOptions
+  });
+}
+
+function getStatLabel(stat) {
+  const labels = {
+    season_standings: 'Season Standings',
+    season_points: 'Season Points',
+    finish_position_points: 'Finish Position Points',
+    stage_points: 'Stage Points',
+    playoff_points: 'Playoff Points',
+    wins: 'Wins'
+  };
+  return labels[stat] || stat;
+}
+
+function getColor(index) {
+  const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+  return colors[index % colors.length];
+}
+
+  function getColor(index) {
+    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+    return colors[index % colors.length];
+  }
+
+  document.addEventListener('DOMContentLoaded', setupDriverStats);
+
         document.addEventListener('DOMContentLoaded', () => {
             setupMainTabs();  // Sets up Race Results and Analysis tabs
-            setupInnerTabs();  // Sets up inner tabs (Race Results, Race Details, etc.) and session tabs
+            setupInnerTabs();
+            setupDriverStats();  // Sets up inner tabs (Race Results, Race Details, etc.) and session tabs
         });
 
     </script>

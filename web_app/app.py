@@ -1,4 +1,5 @@
 import sys
+import json
 sys.path.append('.')
 sys.path.append('..')
 
@@ -32,10 +33,33 @@ def sort_months(month_name):
     }
     return month_order[month_name]
 
-@app.route('/nascar')
+def get_selected_driver_data(driver_ids, raw_driver_data):
+    driver_data = {}
+    raw_driver_data = raw_driver_data.sort_values(['driver_name', 'race_number', 'standing_position']).reset_index(drop=True)
+    for driver_id in driver_ids:
+        driver_name = driver_id
+        if driver_name in raw_driver_data['driver_name'].unique():
+            current_data = raw_driver_data[raw_driver_data['driver_name'] == driver_name]
+            driver_data.append({
+                    'id': driver_id,
+                    'name': driver_name,
+                    'race_numbers': current_data['race_number'].tolist(),
+                    'season_standings': current_data['standing_position'].tolist(),
+                    'stage_points': current_data['stage_points'].tolist(),
+                    'finish_position_points': current_data['finish_points'].tolist(),
+                    'season_points': current_data['season_points'].tolist(),
+                    'playoff_points': current_data['playoff_points'].tolist(),
+                    'wins': current_data['wins'].tolist(),
+                })
+    return driver_data
+
+
+@app.route('/nascar', methods=['GET'])
 def nascar():
+    selected_driver_ids = request.args.getlist('driver_ids', type=int)
     selected_season = request.args.get('season', str(date.today().year))
     selected_race_number = request.args.get('race')
+    active_tab = request.args.get('active_tab', 'race-results')
     if not selected_race_number:
         selected_race_number = 1
     raw_race_data = db_reader.get_race_data(selected_season, selected_race_number)
@@ -51,12 +75,20 @@ def nascar():
     if raw_results is not None:
         race_details = data_processing.compose_race_details(raw_results)
         results = data_processing.compose_race_results(raw_results)
-        season_standings_data = data_processing.compose_season_standings_data(raw_standings_data,
+        season_standings_data, raw_driver_data = data_processing.compose_season_standings_data(raw_standings_data,
                                                                               selected_race_number,
                                                                               selected_season)
         playoff_standings_data = data_processing.compose_playoff_standings_data(raw_standings_data,
                                                                                 selected_race_number,
                                                                                 selected_season)
+        drivers = raw_driver_data[
+            raw_driver_data['race_number'] == int(selected_race_number)
+            ].sort_values('standing_position')['driver_name'].tolist()
+        driver_data = get_selected_driver_data(selected_driver_ids, raw_driver_data)
+        driver_race_data = {}
+        for driver in drivers:
+            driver_race_data[driver] = raw_driver_data[raw_driver_data['driver_name'] == driver][['race_number', 'standing_position']].to_dict('records')
+
         raw_race_data['results'] = results
         selected_race_data = raw_race_data
     else:
@@ -75,6 +107,9 @@ def nascar():
         selected_race_details=race_details,
         season_standings=season_standings_data,
         playoff_standings=playoff_standings_data,
+        selected_driver_ids=selected_driver_ids,
+        drivers=drivers,
+        driver_race_data=json.dumps(driver_race_data),
     )
 
 

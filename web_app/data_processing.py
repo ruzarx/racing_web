@@ -203,10 +203,10 @@ def compose_season_standings_data(raw_data: dict, race_number: str, current_seas
                                   'race_stage_points': [res['race_stage_points'] for res in raw_data],
                                   'race_finish_points': [res['race_finish_points'] for res in raw_data],
                                   'race_season_points': [res['race_season_points'] for res in raw_data],
-                                  'initial_season_points': [res['race_season_points'] for res in raw_data],
-                                  'race_number': [res['race_number'] for res in raw_data]})
+                                  'race_number': [res['race_number'] for res in raw_data],
+                                  'race_playoff_points': [res['race_playoff_points'] for res in raw_data]})
     
-    standings_data = standings_calculation(raw_standings_data, int(race_number), int(current_season))
+    standings_data, driver_data = standings_calculation(raw_standings_data, int(race_number), int(current_season))
     standings_data = standings_data.sort_values(by=['season_points'], ascending=False)
     standings_data['pos'] = [x for x in range(1, len(standings_data) + 1)]
 
@@ -235,7 +235,7 @@ def compose_season_standings_data(raw_data: dict, race_number: str, current_seas
                         standings_data['pos'].tolist(),
                )
     }
-    return results
+    return results, driver_data
 
 def compose_playoff_standings_data(raw_data: dict, current_round: str, current_season: str) -> dict:
     current_race = int(current_round)
@@ -246,9 +246,10 @@ def compose_playoff_standings_data(raw_data: dict, current_round: str, current_s
                                   'race_finish_points': [res['race_finish_points'] for res in raw_data],
                                   'race_season_points': [res['race_season_points'] for res in raw_data],
                                   'initial_season_points': [res['race_season_points'] for res in raw_data],
-                                  'race_number': [res['race_number'] for res in raw_data]})
+                                  'race_number': [res['race_number'] for res in raw_data],
+                                  'race_playoff_points': [res['race_playoff_points'] for res in raw_data]})
     
-    data = standings_calculation(raw_standings_data, current_race, int(current_season))
+    data, _ = standings_calculation(raw_standings_data, current_race, int(current_season))
 
     if current_race <= 26:
         standings_data = compose_bubble(data, 16, 'season_wins')

@@ -300,3 +300,49 @@ tbody tr.champion {
 .tab-content, .inner-tab-content {
     margin-top: 20px;
 }
+
+.driver-stats-container {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .driver-selection-container {
+    flex: 0 0 40%;  /* Adjust this value to change the width of the selection area */
+  }
+  
+  .driver-plot-container {
+    flex: 1;
+    min-height: 400px;  /* Adjust the height as needed */
+  }
+  
+  .multi-column-checkboxes {
+    column-count: 3;  /* Adjust this value to change the number of columns */
+    column-gap: 20px;
+    margin-bottom: 15px;
+  }
+  
+  .checkbox-item {
+    break-inside: avoid-column;
+    page-break-inside: avoid;
+    margin-bottom: 5px;
+  }
+  
+  .stats-selector-container {
+    margin-bottom: 10px;
+  }
+  
+  #stats-selector {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+  }
+  
+  #plot-button {
+    margin-top: 10px;
+    width: 100%;
+  }
+  
+  #driver-plot {
+    width: 100%;
+    height: 100%;
+  }

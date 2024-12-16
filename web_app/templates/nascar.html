@@ -351,7 +351,27 @@
                 </ul>
                 <div class="inner-tab-content">
                     <div id="driver-stats-content" class="inner-tab active">
-                        <!-- Driver Stats content goes here -->
+                        <h2>Driver Stats</h2>
+                        <div class="driver-stats-container">
+                            <div class="driver-selection-container">
+                              <div id="driver-selection" class="multi-column-checkboxes"></div>
+                              <div class="stats-selector-container">
+                                <label for="stats-selector">Select Statistic:</label>
+                                <select id="stats-selector">
+                                  <option value="season_standings">Season Standings</option>
+                                  <option value="season_points">Season Points</option>
+                                  <option value="finish_position_points">Finish Position Points</option>
+                                  <option value="stage_points">Stage Points</option>
+                                  <option value="playoff_points">Playoff Points</option>
+                                  <option value="wins">Wins</option>
+                                </select>
+                              </div>
+                              <button id="plot-button">Plot Selected Drivers</button>
+                            </div>
+                            <div class="driver-plot-container">
+                              <div id="driver-plot"></div>
+                            </div>
+                        </div>
                     </div>
                     <div id="track-stats-content" class="inner-tab">
                         <!-- Track Stats content goes here -->

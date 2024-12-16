@@ -155,7 +155,9 @@ def standings_calculation(raw_data: pd.DataFrame, current_race: int, season: int
                     'qualified_to_8': [1 if driver in playoff_8_drivers else 0 for driver in all_drivers],
                     'qualified_to_final': [1 if driver in playoff_4_drivers else 0 for driver in all_drivers],
                     'champion': [1 if driver == champion else 0 for driver in all_drivers]})
-    return standings
+    
+    driver_stats = get_driver_stats(raw_data)
+    return standings, driver_stats
 
 def apply_penalties(season: int,
                     current_race: int,
@@ -190,3 +192,19 @@ def delete_loser(wins_dist, driver):
     if wins_dist[driver] == 0:
         del wins_dist[driver]
     return wins_dist
+
+def get_driver_stats(raw_data):
+    driver_stats = pd.DataFrame({'driver_name': raw_data['driver_name'].values,
+                                 'race_number': raw_data['race_number'].values,
+                                 'stage_points': raw_data['race_stage_points'].values,
+                                 'finish_points': raw_data['race_finish_points'].values,
+                                 'season_points': raw_data['race_season_points'].values,
+                                 'playoff_points': raw_data['race_playoff_points'].values,
+                                 'wins': raw_data['wins'].values})
+    
+    driver_stats['cumulative_points'] = driver_stats.groupby('driver_name')['season_points'].cumsum()
+    driver_stats = driver_stats.sort_values(by=['race_number', 'cumulative_points'], ascending=[True, False])
+    driver_stats['standing_position'] = driver_stats.groupby(
+        'race_number'
+        )['cumulative_points'].rank(method='min', ascending=False).astype(int)
+    return driver_stats
